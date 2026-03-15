@@ -1,3 +1,20 @@
+# Ignorar archivos auxiliares de TeXmaker en MotorCD
+MotorCD/*.aux
+MotorCD/*.log
+MotorCD/*.toc
+MotorCD/*.out
+MotorCD/*.bbl
+MotorCD/*.blg
+MotorCD/*.synctex.gz
+MotorCD/*.fdb_latexmk
+MotorCD/*.fls
+MotorCD/*.maf
+MotorCD/*.mtc*
+MotorCD/*.pdfsync
+MotorCD/*.nav
+MotorCD/*.snm
+MotorCD/*.vrb
+
 ## Core latex/pdflatex auxiliary files:
 *.aux
 *.lof
