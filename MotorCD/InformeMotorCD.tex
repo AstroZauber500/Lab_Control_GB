@@ -15,6 +15,10 @@
 \usepackage[english]{babel}
 \usepackage{siunitx}
 \usepackage{float}
+\usepackage[table]{xcolor}
+\usepackage{booktabs}
+
+
 
 \begin{document}
 
@@ -28,23 +32,19 @@
 
 \title{DC Motor Angular Speed Control hps5130}
 
-\author{\IEEEauthorblockN{
-<<<<<<< HEAD
-Eric Castro\IEEEauthorrefmark{1},
-Esteban Segura\IEEEauthorrefmark{1}
-Daniel Chavarria\IEEEauthorrefmark{1}}
+\author{
+\IEEEauthorblockN{
+Eric Castro Velásquez\IEEEauthorrefmark{1},
+Esteban Segura Garcia\IEEEauthorrefmark{1},
+Daniel Chavarria Garcia\IEEEauthorrefmark{1}
+}
 \vspace{2mm}
-\IEEEauthorblockA{\IEEEauthorrefmark{1}School of electronic engineering,
-Costa Rica Institute of Technology (ITCR), 30101 Cartago, Costa Rica, \\ 
-\{ecastro, essegura, dachavarria\}@estudiantec.cr}}
-=======
-Eric Castro Velásquez \IEEEauthorrefmark{1},
-Esteban Segura Garcia\IEEEauthorrefmark{1} y 
-Daniel Chavarria Garcia\IEEEauthorrefmark{1}}
-\vspace{2mm}
-\IEEEauthorblockA{\IEEEauthorrefmark{1}Escuela de Ingeniería Electrónica,
-Instituto Tecnológico de Costa Rica (ITCR), 30101 Cartago, Costa Rica, \\ \{ecastro, 	essegura, 	dachavarria\}@estudiantec.cr}}
->>>>>>> d5e08cd7e8ae11f8ca94e3d42c3cb7c7d9a5a4ba
+\IEEEauthorblockA{
+\IEEEauthorrefmark{1}Escuela de Ingeniería Electrónica,
+Instituto Tecnológico de Costa Rica (ITCR), 30101 Cartago, Costa Rica, \\
+\{ecastro, essegura, dachavarria\}@estudiantec.cr
+}
+}
 
 \maketitle
 
@@ -236,51 +236,51 @@ for the three PI controllers designed in both continuous and discrete time.
 
 \subsubsection{Step Response}
 
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=\columnwidth]{figures/experimental_step.png}
-    \caption{Experimental step response of the implemented PI controllers 
-    on the \textit{kitprog059} platform on continuous-time.}
-    \label{fig:experimentalc_step}
-\end{figure}
+%
+%\begin{figure}[H]
+%    \centering
+%    \includegraphics[width=\columnwidth]{figures/experimental_step.png}
+%    \caption{Experimental step response of the implemented PI controllers 
+%    on the \textit{kitprog059} platform on continuous-time.}
+%   \label{fig:experimentalc_step}
+%\end{figure}
 
 
 
 \subsubsection{Disturbance Rejection}
 
 
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=\columnwidth]{figures/experimental_disturbance.png}
-    \caption{Experimental disturbance rejection response of the implemented 
-    PI controllers on the \textit{kitprog059} platform on continuous-time.}
-    \label{fig:experimentalc_disturbance}
-\end{figure}
+%\begin{figure}[H]
+%    \centering
+%    \includegraphics[width=\columnwidth]{figures/experimental_disturbance.png}
+%    \caption{Experimental disturbance rejection response of the implemented 
+%    PI controllers on the \textit{kitprog059} platform on continuous-time.}
+%    \label{fig:experimentalc_disturbance}
+%\end{figure}
 
 
 \subsection{Discrete-Time Experimental Results}
 
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=\columnwidth]{figures/experimental_step.png}
-    \caption{Experimental step response of the implemented PI controllers 
-    on the \textit{kitprog059} platform on discrete-time.}
-    \label{fig:experimentald_step}
-\end{figure}
+%\begin{figure}[H]
+%    \centering
+%    \includegraphics[width=\columnwidth]{figures/experimental_step.png}
+%    \caption{Experimental step response of the implemented PI controllers 
+%    on the \textit{kitprog059} platform on discrete-time.}
+%    \label{fig:experimentald_step}
+%\end{figure}
 
 
 
 \subsubsection{Disturbance Rejection}
 
 
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=\columnwidth]{figures/experimental_disturbance.png}
-    \caption{Experimental disturbance rejection response of the implemented 
-    PI controllers on the \textit{kitprog059} platform on discrete-time.}
-    \label{fig:experimentald_disturbance}
-\end{figure}
+%\begin{figure}[H]
+%    \centering
+%    \includegraphics[width=\columnwidth]{figures/experimental_disturbance.png}
+%    \caption{Experimental disturbance rejection response of the implemented 
+%    PI controllers on the \textit{kitprog059} platform on discrete-time.}
+%    \label{fig:experimentald_disturbance}
+%\end{figure}
 
 \subsection{Performance Summary}
 
@@ -295,11 +295,11 @@ for the three PI controllers designed in both continuous and discrete time.
         \textbf{$e_{ss}$} \\
         \hline
         PI$_1$ & Continuous & 310 & 0 & 0 \\
-        PI$_2$ & Continuous & & & \\
+        PI$_2$ & Continuous & 391 & 0 & 0 \\
         PI$_3$ & Continuous & & & \\
         \hline
         PI$_1$ & Discrete   & 265 & 0.49 & 0 \\
-        PI$_2$ & Discrete   & & & \\
+        PI$_2$ & Discrete   &370 & 0 & 0 \\
         PI$_3$ & Discrete   & & & \\
         \hline
     \end{tabular}
@@ -331,6 +331,77 @@ for the three PI controllers designed in both continuous and discrete time.
 
 \subsection{Statistical analysis}
 
+
+
+Tables \ref{tab:velocity_results} and \ref{tab:current_results} summarize the parameter estimation results for both velocity and current models. In the case of velocity, the gain $K$ exhibits excellent repeatability, with a low coefficient of variation of 1.64\%, indicating a highly consistent estimation across repetitions. However, the time constant $\tau$ presents a significantly high variability (CV = 47.14\%), suggesting that this parameter is strongly affected by experimental conditions, measurement noise, or variations in the transient response.
+
+For the current model, the behavior is notably different. The gain $K$ shows moderate variability (CV = 13.93\%), which can still be considered acceptable but indicates some dispersion between measurements. On the other hand, the time constant $\tau$ demonstrates excellent repeatability, with a very low coefficient of variation of 4.61\%, indicating stable and reliable estimation.
+
+Overall, these results indicate that the estimation quality depends on both the measured variable and the parameter of interest. While the gain in velocity and the time constant in current are highly reliable, the time constant in velocity requires further analysis or additional repetitions to reduce uncertainty.
+
+\begin{table}[H]
+\centering
+\caption{Experimental results for velocity model identification}
+\label{tab:velocity_results}
+\resizebox{\columnwidth}{!}{
+\begin{tabular}{c c c c c}
+\hline
+Parameter & Rep. 1 & Rep. 2 & Rep. 3 & Statistics \\
+\hline
+$K$ & 1.3342 & 1.3708 & 1.3746 & $\mu=1.3598$, $s=0.0223$, $CV=1.64\%$ \\
+$\tau$ (s) & 0.2301 & 0.1099 & 0.1071 & $\mu=0.1490$, $s=0.0703$, $CV=47.14\%$ \\
+\hline
+\end{tabular}
+}
+\end{table}
+
+
+\begin{table}[H]
+\centering
+\caption{Experimental results for current model identification}
+\label{tab:current_results}
+\resizebox{\columnwidth}{!}{
+\begin{tabular}{c c c c c}
+\hline
+Parameter & Rep. 1 & Rep. 2 & Rep. 3 & Statistics \\
+\hline
+$K$ & 0.1644 & 0.1326 & 0.1282 & $\mu=0.1418$, $s=0.0197$, $CV=13.93\%$ \\
+$\tau$ (s) & 0.1090 & 0.1081 & 0.1174 & $\mu=0.1115$, $s=0.0051$, $CV=4.61\%$ \\
+\hline
+\end{tabular}
+}
+\end{table}
+
+
+
+Table \ref{tab:rmse_results} presents the RMSE obtained during both training and validation for the three identified transfer functions. The model trained with Rep.~1 shows the lowest training RMSE (0.0952), indicating a very good fit to its own dataset. However, its validation RMSE is significantly higher (0.4089), suggesting poor generalization and possible overfitting.
+
+In contrast, the models trained with Rep.~2 and Rep.~3 exhibit slightly higher training RMSE values (0.1122 and 0.1114, respectively), but substantially lower validation errors. Among them, the model trained with Rep.~3 achieves the lowest validation RMSE (0.2113), closely followed by Rep.~2 (0.2220). This indicates that both models generalize better to unseen data, with Rep.~3 providing the most accurate prediction overall.
+
+According to the comparison criteria between training and validation RMSE, the models trained with Rep.~2 and Rep.~3 demonstrate adequate generalization, while the model trained with Rep.~1 fails to generalize properly.
+
+\begin{table}[H]
+\centering
+\caption{Training and validation RMSE for the identified transfer functions}
+\label{tab:rmse_results}
+\resizebox{\columnwidth}{!}{
+\begin{tabular}{c c c c}
+\hline
+Training & Validation & RMSE (fit) & RMSE (validation) \\
+\hline
+Rep. 1 & Rep. 2, 3 & 0.0952 & 0.4089 \\
+Rep. 2 & Rep. 1, 3 & 0.1122 & 0.2220 \\
+Rep. 3 & Rep. 1, 2 & 0.1114 & 0.2113 \\
+\hline
+\end{tabular}
+}
+\end{table}
+
+A comprehensive evaluation considering statistical metrics and RMSE values allows selecting the most appropriate transfer function. From the statistical analysis, the gain $K$ in velocity exhibits excellent repeatability, whereas the time constant $\tau$ shows high variability , indicating uncertainty in its estimation. 
+
+Between these two, the model trained with Rep.~3 yields the lowest validation RMSE, making it the most reliable representation of the system dynamics. Additionally, its performance is consistent with the acceptable variability observed in the gain and the more stable behavior seen in current-based parameters.
+
+Therefore, the transfer function obtained from Rep.~3 is selected as the final model, as it provides the best compromise between fitting accuracy and generalization capability.
 \subsection{Experimental versus simulation results}
 
 \section{Conclusions}
