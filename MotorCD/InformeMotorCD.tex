@@ -18,19 +18,11 @@
 \usepackage[table]{xcolor}
 \usepackage{booktabs}
 
-
-
 \begin{document}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Rename abstract and keywords
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \renewcommand\IEEEkeywordsname{Keywords}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-
-\title{DC Motor Angular Speed Control hps5130}
+\title{DC Motor Angular Speed Control}
 
 \author{
 \IEEEauthorblockN{
@@ -40,8 +32,8 @@ Daniel Chavarria Garcia\IEEEauthorrefmark{1}
 }
 \vspace{2mm}
 \IEEEauthorblockA{
-\IEEEauthorrefmark{1}Escuela de Ingeniería Electrónica,
-Instituto Tecnológico de Costa Rica (ITCR), 30101 Cartago, Costa Rica, \\
+\IEEEauthorrefmark{1}School of Electronics Engineering,
+Instituto Tecnológico de Costa Rica (ITCR), 30101 Cartago, Costa Rica \\
 \{ecastro, essegura, dachavarria\}@estudiantec.cr
 }
 }
@@ -49,383 +41,417 @@ Instituto Tecnológico de Costa Rica (ITCR), 30101 Cartago, Costa Rica, \\
 \maketitle
 
 \begin{abstract}
-This paper presents the design and validation.....
+Faltaria hacer esta parte......................................................
+......................................................
+......................................................
+......................................................
+......................................................
+......................................................
+......................................................
+......................................................
+......................................................
+......................................................
+......................................................
+......................................................
+......................................................\\
+......................................................
+......................................................
+......................................................
+......................................................
+......................................................
+......................................................
+......................................................
+......................................................
+......................................................
+......................................................
+......................................................
+......................................................
+......................................................
+......................................................\\
+......................................................
+
 \end{abstract}
 
 \begin{IEEEkeywords}
-DC Motor, controller, PI, stabilization, overshoot.
+DC motor, discrete-time control, overshoot, PI controller, root locus.
 \end{IEEEkeywords}
 
 \IEEEpeerreviewmaketitle
 
 \section{Introduction}
 
-The control of angular velocity in motor of direct current, is a classic problem of automatic control with a big application in industrials systems and electric conditioning. A typical solution for this type of plant its the proportional-integrative regulator (PI), whose integrative action guarantee a zero steady-state error for inputs like step-type and the capacity of reject disturbances.\cite{ogata}
 
-In this experiment, it is designed a PI regulator for the CD motor system \textit{hps5130}, modelling like a first order system, whose being identify via experimental. The design is performed for both continuous and discrete time with a sampling period of $T_s = \SI{5}{\milli\second}$, meeting the specifications of a settling time of less than 2\% for 300 ms and overshoot of less than 3\%. The results of both designs are verified by simulation in \textit{Simulink}, including the response to disturbances apply to the plant's input and output.\cite{guia}
+The control of angular velocity in DC motors is a classic automatic control problem
+with broad industrial applications. A standard solution is the proportional-integral
+(PI) regulator, whose integral action guarantees zero steady-state error for step
+inputs and provides disturbance rejection capability~\cite{ogata}.
+
+In this work, a PI regulator is designed for the \textit{hps5130} DC motor system,
+modeled as a first-order plant identified experimentally. The design is carried out
+in both continuous and discrete time with a sampling period of
+$T_s = \SI{5}{\milli\second}$, targeting a 2\% settling time below \SI{300}{\milli\second}
+and overshoot below 3\%. Simulation results in \textit{Simulink} and experimental
+validation on the \textit{kitprog059} platform are reported~\cite{guia}.
 
 
 \section{Theoretical Background}
 
-\subsection{Motor CD as the control plant}
 
-The motor's DC current can be modeled as a first-order linear system in the frequency domain, whose transfer function is related to the armature voltage applied to the output angular speed:
+
+\subsection{DC Motor as a Control Plant}
+
+The DC motor angular speed is modeled as a first-order transfer function:
 \begin{equation}
     G(s) = \frac{K}{s + p},
     \label{eq:modelo_motor}
 \end{equation}
+where $K$ is the static gain and $p$ is the dominant pole, both obtained through
+experimental identification~\cite{nise}.
 
-\noindent where $K$ is the static gain and $p$ is the dominant pole, both obtained through experimental identification. \cite{nise}
+\subsection{PI Regulator}
 
-
-\subsection{PI regulator}
-
-The PI regulator can be expressed in continuous time as:
-
+The continuous-time PI controller is expressed as:
 \begin{equation}
     PI(s) = K_P + \frac{K_I}{s} = \frac{K_c(s - z_0)}{s},
     \label{eq:pi_continuo}
 \end{equation}
+where $K_P$ sets the response speed, $K_I$ eliminates steady-state error, and $z_0$
+is the controller zero whose position relative to the plant pole shapes the
+closed-loop dynamics~\cite{nise}.
 
-\noindent where $K_P$ determines the system's response speed and $K_I$ eliminates the steady-state error for step inputs. In its transfer function form, the PI introduces a pole at the origin $s = 0$ and a zero at $s = z_0$, whose relative location with respect to the plant pole directly influences the closed-loop system dynamics.\cite{nise} 
 
-\subsection{Root-locus method}
+\subsection{Root-Locus Design}
 
-The root locus is a graphic technique that allows visualization of the displacement of the poles of the closed-loop in the complex plane $s$, in function of the controller gain. For a system with unity feedback, the poles of the closed-loop satisfy:
-
+The closed-loop poles satisfy $1 + K_c \cdot G_{OL}(s) = 0$, where $G_{OL}(s)$ is
+the open-loop transfer function. Design specifications impose the following constraints
+on the dominant pole location~\cite{nise}:
 \begin{equation}
-    1 + K_c \cdot G_{OL}(s) = 0,
-    \label{eq:lazo_cerrado}
-\end{equation}
-
-\noindent where $G_{OL}(s)$ is the open loop transfer function. The design of the regulator consist in locate the poles of closed-loop in the region's of the plane $s$ that satisfy simultaneously the specifications of settling time and overshoot.\cite{nise} For a second-order system, these specifications impose restrictions on the real part and the angle of the dominant pole, expressed as:
-
-\begin{equation}
-    \sigma = \frac{4}{t_s},
-    \label{eq:sigma}
-\end{equation}
-
-\begin{equation}
+    \sigma = \frac{4}{t_s}, \qquad
     \zeta = \frac{-\ln(M_p/100)}{\sqrt{\pi^2 + \ln^2(M_p/100)}},
-    \label{eq:zeta}
+    \label{eq:specs}
 \end{equation}
+where $\sigma$ is the minimum required real part, $t_s$ is the 2\% settling time,
+and $\zeta$ is the damping ratio corresponding to the maximum overshoot $M_p$.
 
-\noindent where $\sigma$ is the minimum real part required for the dominant pole, $t_s$ is the settling time to the 2\% and $\zeta$ is the damping coefficient corresponding to the maximum overshoot $M_p$ 
 
-\subsection{Controller discretization}
+\subsection{Controller Discretization}
 
-To implement a PI regulator in a system, the controller in the continuous time has to be convert into discrete time. Using the backward Euler approximation, the complex variable $s$ is replaced by:  
-
-\begin{equation}
-    s \approx \frac{z - 1}{T_s \cdot z},
-    \label{eq:euler_backward}
-\end{equation}
-
-\noindent which transforms the continuous PI into its discrete equivalent:
-
+The continuous PI is discretized via the backward Euler approximation
+$s \approx (z-1)/(T_s z)$, yielding:
 \begin{equation}
     PI(z) = \frac{b_1 z + b_0}{z + a_0},
     \label{eq:pi_discreto}
 \end{equation}
+where coefficients $b_1$, $b_0$, and $a_0$ depend on $K_P$, $K_I$, and $T_s$.
+The chosen $T_s = \SI{5}{\milli\second}$ provides between 30 and 75 samples within
+the settling time, ensuring adequate dynamic representation~\cite{ogata,nise}.
 
-\noindent where the coefficients $b_1$, $b_0$ y $a_0$ depends of $K_P$, $K_I$ and the sampling period $T_s$. The selection of $T_s$ must guarantee between 30 and 75 samples during the stabilization time for an adequate representation of the system dynamics.\cite{ogata}\cite{nise}
-
-\subsection{Performance Criteria}
-
-The design specifications are expressed in terms of three main metrics. 
-The 2\% settling time ($t_s$) is defined as the time required for the 
-response to remain within a $\pm 2\%$ band around the final value. The 
-maximum percent overshoot ($M_p$) represents the largest percentage 
-deviation of the response with respect to that final value. Finally, 
-the steady-state error is the difference between the reference value 
-and the final output value under a step input, which is zero when the 
-controller contains an integrator in its structure \cite{ogata}.
 
 \section{Methodology}
 
-This section outlines the design and experimental validation process of 
-three PI controllers for the angular velocity regulation of the 
-\textit{hps5130} DC motor, in both continuous and discrete time.
 
 \subsection{Plant Model Selection}
 
-Multiple CSV datasets were collected from the \textit{hps5130} motor during 
-the identification experiment. A statistical analysis based on the mean and 
-standard deviation of the recorded signals was performed to determine the 
-most representative dataset, which was subsequently used to obtain the 
-empirical first-order plant model via the \textit{System Identification} 
-toolbox in MATLAB, following the structure defined in \eqref{eq:modelo_motor}.
+Three CSV datasets were collected from the \textit{hps5130} motor under the same
+operating conditions. A statistical analysis (mean, standard deviation, and
+coefficient of variation) determined the most representative dataset, which was
+then used to identify an empirical first-order model via the
+\textit{System Identification} toolbox in MATLAB, following \eqref{eq:modelo_motor}.
+The RMSE computed over the remaining datasets served as the generalization criterion
+for model selection.
 
 \subsection{PI Controller Design}
 
-Three PI controllers were designed in both continuous and discrete time 
-using the \textit{sisotool} root locus editor in MATLAB. Each design 
-differed in the location of the real zero relative to the dominant plant 
-pole, following the three placement criteria described in 
-\eqref{eq:pi_continuo}. All designs were constrained to meet a 2\% settling 
-time $t_s < \SI{300}{\milli\second}$ and a maximum percent overshoot 
-$M_p < \SI{3}{\percent}$. The continuous-time controllers were verified 
-in \textit{Simulink} under step input and disturbance rejection conditions, 
-while the discrete-time equivalents were obtained at $T_s = \SI{5}{\milli\second}$ 
-using the \texttt{c2d} function in MATLAB, but also, were verified in \textit{Simulink} under step input and disturbance rejection conditions.
+Three PI controllers were designed in continuous and discrete time using the
+\textit{sisotool} root locus editor in MATLAB. Each design placed the controller zero
+$z_0$ at a different location relative to the dominant plant pole, yielding three
+distinct dynamic responses. All designs were constrained to $t_s < \SI{300}{\milli\second}$
+and $M_p < \SI{3}{\percent}$, as imposed by \eqref{eq:specs}. Discrete equivalents
+were obtained via \texttt{c2d} at $T_s = \SI{5}{\milli\second}$ and verified in
+\textit{Simulink} under step and disturbance inputs.
 
 \subsection{Experimental Validation}
 
-Falta esta parte, se tendría que completar luego del miércoles
+The best-performing discrete-time controller was implemented on the
+\textit{kitprog059} platform. Step reference signals and input disturbances were
+applied to evaluate settling time, overshoot, and steady-state error under real
+operating conditions.
+
 
 \section{Results}
 
-This section presents the simulation and experimental results obtained 
-for the three PI controllers designed in both continuous and discrete time.
 
 \subsection{Continuous-Time Simulation Results}
 
-\subsubsection{Step Response}
-
+Figure~\ref{fig:continuous_step} shows the step response of the three
+continuous-time PI controllers. PI$_1$ and PI$_2$ met the specifications, achieving
+settling times of \SI{310}{\milli\second} and \SI{391}{\milli\second} respectively,
+both with zero overshoot.
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=\columnwidth]{figures/continuous_step.png}
-    \caption{Step response of the three continuous-time PI controllers 
-    obtained in Simulink.}
+    \caption{Step response of the three continuous-time PI controllers in Simulink.}
     \label{fig:continuous_step}
 \end{figure}
 
-
-
-\subsubsection{Disturbance Rejection}
-
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=\columnwidth]{figures/continuous_disturbance.png}
-    \caption{Disturbance rejection response of the three continuous-time 
-    PI controllers obtained in Simulink.}
-    \label{fig:continuous_disturbance}
-\end{figure}
-
-
-
 \subsection{Discrete-Time Simulation Results}
 
-\subsubsection{Step Response}
-
+Figure~\ref{fig:discrete_step} presents the step response of the best discrete-time
+controller (PI$_1$), which achieved $t_s = \SI{265}{\milli\second}$ and
+$M_p = 0.49\%$, both within specifications.
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=\columnwidth]{figures/discrete_step.png}
-    \caption{Step response of the best of three discrete-time PI controllers 
-    obtained in Simulink.}
+    \caption{Step response of the best discrete-time PI controller in Simulink.}
     \label{fig:discrete_step}
 \end{figure}
 
+\subsection{Experimental Results}
 
-
-\subsubsection{Disturbance Rejection}
+Figure~\ref{fig:exp_step_c} shows the experimental step response of the
+continuous-time PI controllers implemented on the \textit{kitprog059} platform.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=\columnwidth]{figures/discrete_disturbance.png}
-    \caption{Disturbance rejection response of the best of three discrete-time 
-    PI controllers obtained in Simulink.}
-    \label{fig:discrete_disturbance}
+    \includegraphics[width=\columnwidth]{figures/experimental_step_c.png}
+    \caption{Experimental step response of the PI controllers on the
+    \textit{kitprog059} platform (continuous-time implementation).}
+    \label{fig:exp_step_c}
 \end{figure}
 
+Figure~\ref{fig:exp_step_d} presents the corresponding experimental step response
+for the discrete-time implementation.
 
-\subsection{Continuous-Time Experimental Results}
-
-\subsubsection{Step Response}
-
-%
-%\begin{figure}[H]
-%    \centering
-%    \includegraphics[width=\columnwidth]{figures/experimental_step.png}
-%    \caption{Experimental step response of the implemented PI controllers 
-%    on the \textit{kitprog059} platform on continuous-time.}
-%   \label{fig:experimentalc_step}
-%\end{figure}
-
-
-
-\subsubsection{Disturbance Rejection}
-
-
-%\begin{figure}[H]
-%    \centering
-%    \includegraphics[width=\columnwidth]{figures/experimental_disturbance.png}
-%    \caption{Experimental disturbance rejection response of the implemented 
-%    PI controllers on the \textit{kitprog059} platform on continuous-time.}
-%    \label{fig:experimentalc_disturbance}
-%\end{figure}
-
-
-\subsection{Discrete-Time Experimental Results}
-
-%\begin{figure}[H]
-%    \centering
-%    \includegraphics[width=\columnwidth]{figures/experimental_step.png}
-%    \caption{Experimental step response of the implemented PI controllers 
-%    on the \textit{kitprog059} platform on discrete-time.}
-%    \label{fig:experimentald_step}
-%\end{figure}
-
-
-
-\subsubsection{Disturbance Rejection}
-
-
-%\begin{figure}[H]
-%    \centering
-%    \includegraphics[width=\columnwidth]{figures/experimental_disturbance.png}
-%    \caption{Experimental disturbance rejection response of the implemented 
-%    PI controllers on the \textit{kitprog059} platform on discrete-time.}
-%    \label{fig:experimentald_disturbance}
-%\end{figure}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\columnwidth]{figures/experimental_step_d.png}
+    \caption{Experimental step response of the PI controllers on the
+    \textit{kitprog059} platform (discrete-time implementation).}
+    \label{fig:exp_step_d}
+\end{figure}
 
 \subsection{Performance Summary}
+
+Tables~\ref{tab:sim_performance} and~\ref{tab:exp_performance} summarize the
+performance metrics for simulation and experimental results respectively. Values of ~\ref{tab:exp_performance} have being obtained by the script in TECDigital.
 
 \begin{table}[H]
     \centering
     \caption{Simulation performance metrics of the designed PI controllers.}
-    \label{tab:performance}
+    \label{tab:sim_performance}
     \begin{tabular}{ccccc}
-        \hline
-        \textbf{Controller} & \textbf{Domain} & 
-        \textbf{$t_s$ (ms)} & \textbf{$M_p$ (\%)} & 
+        \toprule
+        \textbf{Controller} & \textbf{Domain} &
+        \textbf{$t_s$ (ms)} & \textbf{$M_p$ (\%)} &
         \textbf{$e_{ss}$} \\
-        \hline
-        PI$_1$ & Continuous & 310 & 0 & 0 \\
-        PI$_2$ & Continuous & 391 & 0 & 0 \\
-        PI$_3$ & Continuous & & & \\
-        \hline
-        PI$_1$ & Discrete   & 265 & 0.49 & 0 \\
-        PI$_2$ & Discrete   &370 & 0 & 0 \\
-        PI$_3$ & Discrete   & & & \\
-        \hline
+        \midrule
+        PI$_1$ & Continuous & 310  & 0    & 0 \\
+        PI$_2$ & Continuous & 391  & 0    & 0 \\
+        PI$_3$ & Continuous &      &      &   \\
+        \midrule
+        PI$_1$ & Discrete   & 265  & 0.49 & 0 \\
+        PI$_2$ & Discrete   & 370  & 0    & 0 \\
+        PI$_3$ & Discrete   & 370    &      &   \\
+        \bottomrule
     \end{tabular}
 \end{table}
 
 \begin{table}[H]
     \centering
     \caption{Experimental performance metrics of the designed PI controllers.}
-    \label{tab:performance}
+    \label{tab:exp_performance}
     \begin{tabular}{ccccc}
-        \hline
-        \textbf{Controller} & \textbf{Domain} & 
-        \textbf{$t_s$ (ms)} & \textbf{$M_p$ (\%)} & 
+        \toprule
+        \textbf{Controller} & \textbf{Domain} &
+        \textbf{$t_s$ (ms)} & \textbf{$M_p$ (\%)} &
         \textbf{$e_{ss}$} \\
-        \hline
-        PI$_1$ & Continuous & & & \\
-        PI$_2$ & Continuous & & & \\
-        PI$_3$ & Continuous & & & \\
-        \hline
-        PI$_1$ & Discrete   & & & \\
-        PI$_2$ & Discrete   & & & \\
-        PI$_3$ & Discrete   & & & \\
-        \hline
+        \midrule
+        PI$_1$ & Continuous & 330 & 0.95 & ±0.0235 \\
+        PI$_2$ & Continuous & 315 & 0.83 & ±0.03 \\
+        PI$_3$ & Continuous & 330 & 1.26 & ±0.0313 \\
+        \midrule
+        PI$_1$ & Discrete   & 165 & 23.4 & ±0.034 \\
+        PI$_2$ & Discrete   & 180 & 2 & ±0.032 \\
+        PI$_3$ & Discrete   & 230 & 1.45 & ±0.0305 \\
+        \bottomrule
     \end{tabular}
 \end{table}
 
 
 \section{Discussion}
 
-\subsection{Statistical analysis}
 
+\subsection{Statistical Analysis of Plant Identification}
 
-
-Tables \ref{tab:velocity_results} and \ref{tab:current_results} summarize the parameter estimation results for both velocity and current models. In the case of velocity, the gain $K$ exhibits excellent repeatability, with a low coefficient of variation of 1.64\%, indicating a highly consistent estimation across repetitions. However, the time constant $\tau$ presents a significantly high variability (CV = 47.14\%), suggesting that this parameter is strongly affected by experimental conditions, measurement noise, or variations in the transient response.
-
-For the current model, the behavior is notably different. The gain $K$ shows moderate variability (CV = 13.93\%), which can still be considered acceptable but indicates some dispersion between measurements. On the other hand, the time constant $\tau$ demonstrates excellent repeatability, with a very low coefficient of variation of 4.61\%, indicating stable and reliable estimation.
-
-Overall, these results indicate that the estimation quality depends on both the measured variable and the parameter of interest. While the gain in velocity and the time constant in current are highly reliable, the time constant in velocity requires further analysis or additional repetitions to reduce uncertainty.
+Tables~\ref{tab:velocity_results} and~\ref{tab:current_results} summarize the
+parameter estimation results. For the velocity model, the gain $K$ shows excellent
+repeatability (CV = 1.64\%), while the time constant $\tau$ presents high variability
+(CV = 47.14\%), likely caused by noise in the transient response and variability in
+initial motor conditions. For the current model, the situation reverses: $\tau$ is
+highly repeatable (CV = 4.61\%) whereas $K$ shows moderate dispersion (CV = 13.93\%).
 
 \begin{table}[H]
 \centering
-\caption{Experimental results for velocity model identification}
+\caption{Experimental results for velocity model identification.}
 \label{tab:velocity_results}
-\resizebox{\columnwidth}{!}{
-\begin{tabular}{c c c c c}
-\hline
-Parameter & Rep. 1 & Rep. 2 & Rep. 3 & Statistics \\
-\hline
-$K$ & 1.3342 & 1.3708 & 1.3746 & $\mu=1.3598$, $s=0.0223$, $CV=1.64\%$ \\
-$\tau$ (s) & 0.2301 & 0.1099 & 0.1071 & $\mu=0.1490$, $s=0.0703$, $CV=47.14\%$ \\
-\hline
-\end{tabular}
-}
+\resizebox{\columnwidth}{!}{%
+\begin{tabular}{ccccc}
+\toprule
+\textbf{Parameter} & \textbf{Rep.\,1} & \textbf{Rep.\,2} & \textbf{Rep.\,3} & \textbf{Statistics} \\
+\midrule
+$K$        & 1.3342 & 1.3708 & 1.3746 & $\mu=1.3598$,\ $s=0.0223$,\ $CV=1.64\%$ \\
+$\tau$ (s) & 0.2301 & 0.1099 & 0.1071 & $\mu=0.1490$,\ $s=0.0703$,\ $CV=47.14\%$ \\
+\bottomrule
+\end{tabular}}
 \end{table}
-
 
 \begin{table}[H]
 \centering
-\caption{Experimental results for current model identification}
+\caption{Experimental results for current model identification.}
 \label{tab:current_results}
-\resizebox{\columnwidth}{!}{
-\begin{tabular}{c c c c c}
-\hline
-Parameter & Rep. 1 & Rep. 2 & Rep. 3 & Statistics \\
-\hline
-$K$ & 0.1644 & 0.1326 & 0.1282 & $\mu=0.1418$, $s=0.0197$, $CV=13.93\%$ \\
-$\tau$ (s) & 0.1090 & 0.1081 & 0.1174 & $\mu=0.1115$, $s=0.0051$, $CV=4.61\%$ \\
-\hline
-\end{tabular}
-}
+\resizebox{\columnwidth}{!}{%
+\begin{tabular}{ccccc}
+\toprule
+\textbf{Parameter} & \textbf{Rep.\,1} & \textbf{Rep.\,2} & \textbf{Rep.\,3} & \textbf{Statistics} \\
+\midrule
+$K$        & 0.1644 & 0.1326 & 0.1282 & $\mu=0.1418$,\ $s=0.0197$,\ $CV=13.93\%$ \\
+$\tau$ (s) & 0.1090 & 0.1081 & 0.1174 & $\mu=0.1115$,\ $s=0.0051$,\ $CV=4.61\%$ \\
+\bottomrule
+\end{tabular}}
 \end{table}
 
-
-
-Table \ref{tab:rmse_results} presents the RMSE obtained during both training and validation for the three identified transfer functions. The model trained with Rep.~1 shows the lowest training RMSE (0.0952), indicating a very good fit to its own dataset. However, its validation RMSE is significantly higher (0.4089), suggesting poor generalization and possible overfitting.
-
-In contrast, the models trained with Rep.~2 and Rep.~3 exhibit slightly higher training RMSE values (0.1122 and 0.1114, respectively), but substantially lower validation errors. Among them, the model trained with Rep.~3 achieves the lowest validation RMSE (0.2113), closely followed by Rep.~2 (0.2220). This indicates that both models generalize better to unseen data, with Rep.~3 providing the most accurate prediction overall.
-
-According to the comparison criteria between training and validation RMSE, the models trained with Rep.~2 and Rep.~3 demonstrate adequate generalization, while the model trained with Rep.~1 fails to generalize properly.
+Table~\ref{tab:rmse_results} shows that the model from Rep.\,3 achieves the lowest
+validation RMSE (0.2113), making it the best compromise between fit accuracy and
+generalization. The Rep.\,1 model, despite the lowest training error (0.0952),
+exhibits the highest validation RMSE (0.4089), indicating overfitting.
 
 \begin{table}[H]
 \centering
-\caption{Training and validation RMSE for the identified transfer functions}
+\caption{Training and validation RMSE for the identified transfer functions.}
 \label{tab:rmse_results}
-\resizebox{\columnwidth}{!}{
-\begin{tabular}{c c c c}
-\hline
-Training & Validation & RMSE (fit) & RMSE (validation) \\
-\hline
-Rep. 1 & Rep. 2, 3 & 0.0952 & 0.4089 \\
-Rep. 2 & Rep. 1, 3 & 0.1122 & 0.2220 \\
-Rep. 3 & Rep. 1, 2 & 0.1114 & 0.2113 \\
-\hline
-\end{tabular}
-}
+\resizebox{\columnwidth}{!}{%
+\begin{tabular}{cccc}
+\toprule
+\textbf{Training} & \textbf{Validation} & \textbf{RMSE (fit)} & \textbf{RMSE (val.)} \\
+\midrule
+Rep.\,1 & Rep.\,2, 3 & 0.0952 & 0.4089 \\
+Rep.\,2 & Rep.\,1, 3 & 0.1122 & 0.2220 \\
+Rep.\,3 & Rep.\,1, 2 & 0.1114 & 0.2113 \\
+\bottomrule
+\end{tabular}}
 \end{table}
 
-A comprehensive evaluation considering statistical metrics and RMSE values allows selecting the most appropriate transfer function. From the statistical analysis, the gain $K$ in velocity exhibits excellent repeatability, whereas the time constant $\tau$ shows high variability , indicating uncertainty in its estimation. 
+\subsection{Noise Analysis}
 
-Between these two, the model trained with Rep.~3 yields the lowest validation RMSE, making it the most reliable representation of the system dynamics. Additionally, its performance is consistent with the acceptable variability observed in the gain and the more stable behavior seen in current-based parameters.
+The angular speed signal was analyzed during closed-loop operation under a
+step input with disturbance, sampled at \SI{100}{\hertz} over a total duration
+of \SI{17.87}{\second} (1787 samples). Figure~\ref{fig:noise} shows the
+time-domain signal along with its power spectral density (PSD).
 
-Therefore, the transfer function obtained from Rep.~3 is selected as the final model, as it provides the best compromise between fitting accuracy and generalization capability.
-\subsection{Experimental versus simulation results}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\columnwidth]{figures/noise_analysis.png}
+    \caption{Noise Analysis.}
+    \label{fig:noise}
+\end{figure}
+
+The signal mean was \SI{3920}{RPM} against a setpoint of \SI{4000}{RPM},
+yielding a static error of only \SI{-80}{RPM} ($-2\%$), which confirms
+the integral action effectively eliminates steady-state error in practice.
+The standard deviation was $\sigma = \SI{490}{RPM}$ and the peak-to-peak
+amplitude reached \SI{4390}{RPM}, representing 12.3\% of the reference
+speed. The RMSE with respect to the setpoint was \SI{500}{RPM},
+consistent with the $\sigma$ value given the near-zero mean error.
+
+Spectral analysis revealed a dominant frequency component at
+\SI{0.168}{\hertz} with an amplitude of \SI{190}{RPM}, suggesting the
+disturbance is not purely random but contains a low-frequency oscillatory
+component, likely associated with mechanical load periodicity or
+commutator switching. The total noise power estimated from the PSD was
+\SI{2e4}{RPM\squared}, yielding a signal-to-noise ratio of
+\SI{18.04}{\decibel}. This moderate SNR explains the high coefficient
+of variation observed for $\tau$ in velocity model identification
+(CV = 47.14\%): the transient slope estimation is sensitive to the
+low-frequency component at \SI{0.168}{\hertz}, which distorts the
+apparent settling behavior and inflates the variance of $\tau$ across
+repetitions. The current model, whose transient is faster and less
+affected by this component, showed a much lower variability
+(CV = 4.61\% for $\tau$). These results suggest that a pre-identification
+low-pass filter or signal averaging could reduce $\tau$ uncertainty in
+future experiments.
+
+\subsection{Experimental versus Simulation Results}
+
+The experimental results reveal discrepancies with respect to simulation predictions,
+as expected from a first-order model that does not capture friction, dead zone, or
+amplifier nonlinearities.
+ 
+For the continuous-time controllers, the experimental settling times were
+\SI{330}{\milli\second}, \SI{315}{\milli\second}, and \SI{330}{\milli\second} for
+PI$_1$, PI$_2$, and PI$_3$ respectively, compared to simulated values of
+\SI{310}{\milli\second} and \SI{391}{\milli\second} for PI$_1$ and PI$_2$. The
+deviations are moderate and within the same order of magnitude, indicating that the
+identified first-order model captures the dominant dynamics adequately. All three
+continuous-time controllers remained within the \SI{3}{\percent} overshoot
+specification experimentally (0.95\%, 0.83\%, and 1.26\% for PI$_1$, PI$_2$, and
+PI$_3$ respectively), confirming the validity of the root-locus design for this
+implementation domain. The non-zero steady-state error observed ($e_{ss} \approx
+\pm 0.02$--$0.03$) is attributed to sensor quantization and measurement noise at the
+operating speed, rather than a structural failure of the integral action.
+ 
+The discrete-time controllers showed a more pronounced divergence from simulation.
+PI$_2$ and PI$_3$ met the overshoot specification with 2.0\% and 1.45\% respectively,
+and achieved settling times of \SI{180}{\milli\second} and \SI{230}{\milli\second},
+both below the simulated values, suggesting that the real plant dynamics are slightly
+faster than the identified model at this operating point. In contrast, PI$_1$ exhibited
+an overshoot of 23.4\%, far exceeding the \SI{3}{\percent} specification despite
+meeting it in simulation (\SI{0.49}{\percent}). This anomalous behavior is consistent
+with the zero placement of PI$_1$ being closest to the plant pole, which makes the
+closed-loop response more sensitive to model mismatch and to the quantization effects
+inherent in discrete implementation at $T_s = \SI{5}{\milli\second}$. The interaction
+between the low-frequency noise component identified at \SI{0.168}{\hertz} and the
+aggressive gain of PI$_1$ likely amplified the transient overshoot under real
+conditions. PI$_2$ therefore emerges as the best overall discrete-time design,
+satisfying all specifications in both simulation and experiment with the best
+generalization to the real plant.
+
+Additionally, a discrepancy was observed when comparing the performance metrics
+reported in Tables~\ref{tab:sim_performance} and~\ref{tab:exp_performance} with
+those obtained from the graphical analysis using a Python-based script. In
+particular, for the continuous-time response shown in Figure~\ref{fig:exp_step_c},
+the settling time was approximately \SI{715}{\milli\second} with an overshoot of
+2.5\%, which, although still within the specified limits, differs significantly
+from the values reported using the TECDigital script. A similar situation was
+observed in Figure~\ref{fig:exp_step_d}, where the settling time was approximately
+\SI{810}{\milli\second} and the overshoot reached 2.6\%. 
+
+In both cases, the steady-state error remained within the required bounds,
+indicating that the integral action was still effective. However, these
+differences suggest that the TECDigital script may produce inaccurate estimates
+of settling time and overshoot, and therefore may not fully reflect the actual
+dynamic response of the controller. This highlights the importance of validating
+automated performance metrics with direct analysis of the system response.
+
 
 \section{Conclusions}
 
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{thebibliography}{99}
 
 \bibitem{ogata}
-K. Ogata, \textit{Modern Control Engineering}, 5th ed. 
+K. Ogata, \textit{Modern Control Engineering}, 5th ed.
 Upper Saddle River, NJ: Prentice Hall, 2010.
 
 \bibitem{nise}
-N. S. Nise, \textit{Control Systems Engineering}, 7th ed. 
+N. S. Nise, \textit{Control Systems Engineering}, 7th ed.
 Hoboken, NJ: Wiley, 2015.
 
 \bibitem{guia}
-E. Interiano and A. Ruiz, ``Proyecto Corto: Control de velocidad 
-angular del motor CD hps5130,'' Laboratorio de Control Automático, 
-EL-5409, Escuela de Ingeniería en Electrónica, Instituto Tecnológico 
+E. Interiano and A. Ruiz, ``Proyecto Corto: Control de velocidad
+angular del motor CD hps5130,'' Laboratorio de Control Automático,
+EL-5409, Escuela de Ingeniería en Electrónica, Instituto Tecnológico
 de Costa Rica, San José, Costa Rica, Mar. 2025.
 
 \end{thebibliography}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \end{document}
-
-
