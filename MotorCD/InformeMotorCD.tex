@@ -1,196 +1,457 @@
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% File:    Paper.tex based on IEEEtran.bst y IEEEtran.cls          %
-% Date     1/21/2020                                               %
-% Version: Paper.tex                                               %
-% Autor:   Michael Shell                                           %
-% Modificated: Ing. Sergio Arriola-Valverde. M.Sc                  %
-% paper template for courses                                       %
-%******************************************************************%
-
 \documentclass[conference]{IEEEtran}
 \usepackage{cite}
 
 \ifCLASSINFOpdf
-  % \usepackage[pdftex]{graphicx}
-  % declare the path(s) where your graphic files are
-  % \graphicspath{{../pdf/}{../jpeg/}}
-  % and their extensions so you won't have to specify these with
-  % every instance of \includegraphics
-  % \DeclareGraphicsExtensions{.pdf,.jpeg,.png}
 \else
-  % or other class option (dvipsone, dvipdf, if not using dvips). graphicx
-  % will default to the driver specified in the system graphics.cfg if no
-  % driver is specified.
-  % \usepackage[dvips]{graphicx}
-  % declare the path(s) where your graphic files are
-  % \graphicspath{{../eps/}}
-  % and their extensions so you won't have to specify these with
-  % every instance of \includegraphics
-  % \DeclareGraphicsExtensions{.eps}
 \fi
-% graphicx was written by David Carlisle and Sebastian Rahtz. It is
-% required if you want graphics, photos, etc. graphicx.sty is already
-% installed on most LaTeX systems. The latest version and documentation
-% can be obtained at: 
-% http://www.ctan.org/pkg/graphicx
-% Another good source of documentation is "Using Imported Graphics in
-% LaTeX2e" by Keith Reckdahl which can be found at:
-% http://www.ctan.org/pkg/epslatex
-%
-% latex, and pdflatex in dvi mode, support graphics in encapsulated
-% postscript (.eps) format. pdflatex in pdf mode supports graphics
-% in .pdf, .jpeg, .png and .mps (metapost) formats. Users should ensure
-% that all non-photo figures use a vector format (.eps, .pdf, .mps) and
-% not a bitmapped formats (.jpeg, .png). The IEEE frowns on bitmapped formats
-% which can result in "jaggedy"/blurry rendering of lines and letters as
-% well as large increases in file sizes.
-%
-% You can find documentation about the pdfTeX application at:
-% http://www.tug.org/applications/pdftex
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Packages used
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \usepackage{amsmath}
 \usepackage{url}
 \usepackage{graphicx}
-\usepackage{svg}
 \usepackage[hidelinks,bookmarks=false]{hyperref}
 \usepackage{scalerel}
 \usepackage{tikz}
 \usepackage[utf8]{inputenc}
-\usepackage[spanish,es-noshorthands]{babel}
-\usetikzlibrary{svg.path}
-\usepackage{gnuplottex}
+\usepackage[english]{babel}
+\usepackage{siunitx}
+\usepackage{float}
+\usepackage[table]{xcolor}
+\usepackage{booktabs}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% ORCID logo
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\definecolor{orcidlogocol}{HTML}{A6CE39}
-\tikzset{
-  orcidlogo/.pic={
-    \fill[orcidlogocol] svg{M256,128c0,70.7-57.3,128-128,128C57.3,256,0,198.7,0,128C0,57.3,57.3,0,128,0C198.7,0,256,57.3,256,128z};
-    \fill[white] svg{M86.3,186.2H70.9V79.1h15.4v48.4V186.2z}
-                 svg{M108.9,79.1h41.6c39.6,0,57,28.3,57,53.6c0,27.5-21.5,53.6-56.8,53.6h-41.8V79.1z M124.3,172.4h24.5c34.9,0,42.9-26.5,42.9-39.7c0-21.5-13.7-39.7-43.7-39.7h-23.7V172.4z}
-                 svg{M88.7,56.8c0,5.5-4.5,10.1-10.1,10.1c-5.6,0-10.1-4.6-10.1-10.1c0-5.6,4.5-10.1,10.1-10.1C84.2,46.7,88.7,51.3,88.7,56.8z};
-  }
-}
-
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Rename Keywords name from Palabras Clave
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\renewcommand\IEEEkeywordsname{Palabras Clave}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-% Document
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \begin{document}
 
-\title{ Control de velocidad angular del motor CD hps5130}
+\renewcommand\IEEEkeywordsname{Keywords}
 
-\author{\IEEEauthorblockN{
-Eric Castro Velásquez \IEEEauthorrefmark{1},
-Esteban Segura Garcia\IEEEauthorrefmark{1} y 
-Daniel Chavarria Garcia\IEEEauthorrefmark{1}}
+\title{DC Motor Angular Speed Control}
+
+\author{
+\IEEEauthorblockN{
+Eric Castro Velásquez\IEEEauthorrefmark{1},
+Esteban Segura Garcia\IEEEauthorrefmark{1},
+Daniel Chavarria Garcia\IEEEauthorrefmark{1}
+}
 \vspace{2mm}
-\IEEEauthorblockA{\IEEEauthorrefmark{1}Escuela de Ingeniería Electrónica,
-Instituto Tecnológico de Costa Rica (ITCR), 30101 Cartago, Costa Rica, \\ \{ecastro, 	essegura, 	dachavarria\}@estudiantec.cr}}
+\IEEEauthorblockA{
+\IEEEauthorrefmark{1}School of Electronics Engineering,
+Instituto Tecnológico de Costa Rica (ITCR), 30101 Cartago, Costa Rica \\
+\{ecastro, essegura, dachavarria\}@estudiantec.cr
+}
+}
 
-% make the title area
 \maketitle
 
 \begin{abstract}
-En este apartado se resume en cortas palabras de que tratará el informe en términos de metodologías, análisis y resultados importante logrados durante la práctica dirigida. Es importante tomar en cuenta que esta sección deberá tener una extensión entre 100 a 250 palabras como máximo y nunca se utilizarán referencias bibliográficas de ningún tipo. La coherencia y sentido lógico de la redacción es importante para lograr una buena transmisión de las ideas a la hora de redactar documentos con poca extensión y gran volumen de datos y resultados.\\
-%\vspace{1mm}
+Faltaria hacer esta parte......................................................
+......................................................
+......................................................
+......................................................
+......................................................
+......................................................
+......................................................
+......................................................
+......................................................
+......................................................
+......................................................
+......................................................
+......................................................\\
+......................................................
+......................................................
+......................................................
+......................................................
+......................................................
+......................................................
+......................................................
+......................................................
+......................................................
+......................................................
+......................................................
+......................................................
+......................................................
+......................................................\\
+......................................................
+
 \end{abstract}
+
 \begin{IEEEkeywords}
-Se recomienda que sean entre 4 a 5 palabras claves como máximo, estas palabras sirven para agilizar los buscadores cuando se necesitan hacer consultas de temas muy específicos. Una selección adecuada de palabras clave permitirá que otras persona puedan encontrar su articulo o informe.
+DC motor, discrete-time control, overshoot, PI controller, root locus.
 \end{IEEEkeywords}
 
 \IEEEpeerreviewmaketitle
 
-\section{Introducción}
+\section{Introduction}
 
-La introducción de un artículo científico u informe, es una de las partes más importantes debido a que es en dicha parte donde el lector se informará de que trata lo que leerá, es por ello que la organización de las ideas y redacción son importantes. Para la redacción de esta sección, es necesario tomar en cuenta que las ideas deberán ser concisas y directas, es por ello que la redundancia de ideas debe ser eliminado como de lugar. 
 
-No obstante es acostumbrado en informe técnicos o de laboratorio discutir los alcances u objetivos del experimento o práctica guiada en prosa, nunca se deberán redactar los pasos de medición ni dar explicaciones de como obtener los resultados, y ni muchos utilizar frases genéricas o cualitativas ``valores muy altos'', ``interfaces amigables'', ``los resultados son parecidos'', ``nosotros medimos y vimos que no eran iguales'', entre otros.
+The control of angular velocity in DC motors is a classic automatic control problem
+with broad industrial applications. A standard solution is the proportional-integral
+(PI) regulator, whose integral action guarantees zero steady-state error for step
+inputs and provides disturbance rejection capability~\cite{ogata}.
 
-Finalmente recuerde concluir sus ideas y dar a entender por qué lo que se presentará es relevante, la extensión de este apartado puede ser de una columna únicamente no es necesario exceder dicha extensión. Para una mejor compresión u orientación se recomienda consultar la guía elaborada por el profesor Dr.-Ing. Pablo Alvarado-Moya si desea ver más detalle al respecto y cuestiones de redacción \underline{\url{http://www.ie.tec.ac.cr/palvarado/LabCE/lce_guia_informe.pdf}} \cite{Pablo2018}.
+In this work, a PI regulator is designed for the \textit{hps5130} DC motor system,
+modeled as a first-order plant identified experimentally. The design is carried out
+in both continuous and discrete time with a sampling period of
+$T_s = \SI{5}{\milli\second}$, targeting a 2\% settling time below \SI{300}{\milli\second}
+and overshoot below 3\%. Simulation results in \textit{Simulink} and experimental
+validation on the \textit{kitprog059} platform are reported~\cite{guia}.
 
-\section{Metodología}
-Antes de iniciar con la explicación del proceso metodológico de medición, es necesario dar una introducción rápida de lo que se verá dentro de la sección, esto ayuda a orientar al lector. En relación a la extensión del párrafo introductorio, se recomienda de tres a cuatro líneas como máximo.
 
-La metodología de manera genérica pretende dar una explicación del procedimiento o métodos necesario para la obtención de resultados. Para el caso de un curso de ingeniería es prudente que se ahonde en detalles técnicos y matemáticos para dar explicación robusta y científica del proceso que se llevó acabo para la generación de resultados u observaciones.
+\section{Theoretical Background}
 
-Es importante considerar nunca utilizar redacciones que sean como ``Encendimos el analizador y nosotros pusimos un RW de 1 kHz'', ``pusimos, vimos, tocamos las perillas'', o también ``después del paso anterior, vimos que no vimos nada y cambiamos las configuraciones'', entre otras. Las frases anteriores no son claras y además aportan una discusión lógica, concreta y concisa. 
 
-Para brindar un mejor entendimiento de las ideas, en veces es útil la ayuda de diagramas de alto nivel o de flujo que ayuden a entender como se llevó el proceso de medición. Recordar que la redacción sea en prosa y evitar usar viñeta para enumerar pasos o procedimientos, no es acostumbrado debido a que introduce ambigüedad al lector para entender lo que esta leyendo. En veces son utilizadas subsecciones las cuales muestran orden y es más fácil de granular los procedimientos u procesos de medición, eso sí no abuse de las mismas por que no se ve formal para presentación de un documento técnico.
 
-\section{Análisis de Resultados}
-La sección de análisis y conclusión de los resultados obtenidos según el proceso metodológico de medición serán de importancia para lograr conclusiones relevantes y acertadas, es por ello que la redacción y el tiempo verbal deberán ser importantes, es necesario tomar en cuenta que los resultados ya fueron generados, esto como recomendación para la selección del tiempo verbal de la prosa.
+\subsection{DC Motor as a Control Plant}
 
-Es recomendable por cada resultado mostrado discutir el mismo con fundamentos teóricos y lógicos, es por ello que es importante tomar tiempo y analizar los resultados, ideas sin respaldo teórico ni lógico no son bien vistas. Como apoyo para la discusión es indispensable usar gráficos, figuras, tablas y cuadros los cuales deben de tener conexión con la prosa y además bien legible, de otra forma si no son discutidos y mucho menos legibles no aportan nada al artículo u informe.
-
-Cuando se vayan a realizar comparaciones utilizar niveles de comparación cuantitativos y no cualitativos, esto hace referencia a lo siguiente:
-
-\textbf{``En relación a la figura 1 se ve que cae más brusco en comparación con la figura 2''}, la frase anterior no es clara, pero si se tomará la siguiente redacción es más clara \textbf{``Con base al espectro FM de la figura 1 se cuantificó un piso de ruido de -90 dBm, donde para una frecuencia de 500 kHz la potencia medida es de +5 dBm por encima del nivel de piso de ruido obtenido en la figura 2, es por ello que la desviación FM disminuye en al menos 2\% para los casos analizados.''}
-
-Debido a la naturaleza científico-técnica de los reportes es necesario tener en cuenta la notación de ingeniería adecuada, formato de parámetros y las unidades correctas, es por ello que a continuación se muestran los siguientes casos: $S11$ $\neq$ $S_{11}$, $db$ $\neq$ $dB$, $miliwatt$ $\neq$ $mW$, $microwatt$ $\neq$ $\mu W$, $w$ $\neq$ $\omega$, $kiloohm$ $\neq$ $k \Omega$, entre otras.
-
-En relación a la presentación de ecuaciones es necesario, redactar las ideas de tal manera que la ecuación este autocontenida en el texto y sea de fácil entendimiento para el lector. Para ello tome el siguiente ejemplo de ecuación:
-
-\textbf{``El nivel de detección mínimo (LOD) para un modelo de elevación digital esta descrito por (\ref{LOD})":}
+The DC motor angular speed is modeled as a first-order transfer function:
 \begin{equation}
-    LOD=\delta (z) = \sqrt{(\delta (z)_{DEM_{t\_n}})^2 + (\delta (z)_{DEM_{t\_{n+1}}})^2}
-    \label{LOD}
+    G(s) = \frac{K}{s + p},
+    \label{eq:modelo_motor}
 \end{equation}
-\textbf{donde $\delta (z)_{DEM_{t\_n}}$ y $\delta (z)_{DEM_{t\_{n+1}}}$ son los valores RMSE obtenidos en el eje $z$ de modelo de elevación digital.}
+where $K$ is the static gain and $p$ is the dominant pole, both obtained through
+experimental identification~\cite{nise}.
 
-En relación a las tablas o cuadros, es necesario resumir la información importante, esto con el objetivo de extraer algún comportamiento o tendencia de los datos, sin embargo es importante además utilizar técnicas de estadística descriptiva e inferencial en algunos casos para la discusión de los datos. Al momento de presentar los datos debe ser concisa la prosa y no redundar ni ahondar mucho en la idea. A continuación se muestra un ejemplo de como mostrar los resultados de un cuadro. \textbf{En el cuadro \ref{Noise} se resumen todos los datos experimentales obtenidos para el piso de ruido en dBm para un rango de frecuencias de 500 hasta 1000 kHz en incremento de 100 kHz respectivamente.}
-\begin{table}[!htb]
-\renewcommand{\arraystretch}{1.3}
-\caption{Tendencia del piso de ruido en función de la frecuencia}
-\label{Noise}
-\centering
-\begin{tabular}{c  c}
-\hline
-\begin{tabular}[|c||c|]{@{}c@{}}$\textbf{Frecuencia}$\\ \textbf{(kHz)} \end{tabular} & \begin{tabular}[|c||c|]{@{}c@{}}$\textbf{Piso de Ruido}$\\ \textbf{(dBm)}\end{tabular}  \\ 
-\hline
-500 & 1.2239 \\
-600 & 1.4576 \\
-700 & 1.9860 \\
-800 & 1.5680 \\
-900 & 1.2370 \\
-1000 & 1.5680 \\
-\hline
-\end{tabular}
-\end{table}
+\subsection{PI Regulator}
 
-\begin{figure}[!ht]
+The continuous-time PI controller is expressed as:
+\begin{equation}
+    PI(s) = K_P + \frac{K_I}{s} = \frac{K_c(s - z_0)}{s},
+    \label{eq:pi_continuo}
+\end{equation}
+where $K_P$ sets the response speed, $K_I$ eliminates steady-state error, and $z_0$
+is the controller zero whose position relative to the plant pole shapes the
+closed-loop dynamics~\cite{nise}.
+
+
+\subsection{Root-Locus Design}
+
+The closed-loop poles satisfy $1 + K_c \cdot G_{OL}(s) = 0$, where $G_{OL}(s)$ is
+the open-loop transfer function. Design specifications impose the following constraints
+on the dominant pole location~\cite{nise}:
+\begin{equation}
+    \sigma = \frac{4}{t_s}, \qquad
+    \zeta = \frac{-\ln(M_p/100)}{\sqrt{\pi^2 + \ln^2(M_p/100)}},
+    \label{eq:specs}
+\end{equation}
+where $\sigma$ is the minimum required real part, $t_s$ is the 2\% settling time,
+and $\zeta$ is the damping ratio corresponding to the maximum overshoot $M_p$.
+
+
+\subsection{Controller Discretization}
+
+The continuous PI is discretized via the backward Euler approximation
+$s \approx (z-1)/(T_s z)$, yielding:
+\begin{equation}
+    PI(z) = \frac{b_1 z + b_0}{z + a_0},
+    \label{eq:pi_discreto}
+\end{equation}
+where coefficients $b_1$, $b_0$, and $a_0$ depend on $K_P$, $K_I$, and $T_s$.
+The chosen $T_s = \SI{5}{\milli\second}$ provides between 30 and 75 samples within
+the settling time, ensuring adequate dynamic representation~\cite{ogata,nise}.
+
+
+\section{Methodology}
+
+
+\subsection{Plant Model Selection}
+
+Three CSV datasets were collected from the \textit{hps5130} motor under the same
+operating conditions. A statistical analysis (mean, standard deviation, and
+coefficient of variation) determined the most representative dataset, which was
+then used to identify an empirical first-order model via the
+\textit{System Identification} toolbox in MATLAB, following \eqref{eq:modelo_motor}.
+The RMSE computed over the remaining datasets served as the generalization criterion
+for model selection.
+
+\subsection{PI Controller Design}
+
+Three PI controllers were designed in continuous and discrete time using the
+\textit{sisotool} root locus editor in MATLAB. Each design placed the controller zero
+$z_0$ at a different location relative to the dominant plant pole, yielding three
+distinct dynamic responses. All designs were constrained to $t_s < \SI{300}{\milli\second}$
+and $M_p < \SI{3}{\percent}$, as imposed by \eqref{eq:specs}. Discrete equivalents
+were obtained via \texttt{c2d} at $T_s = \SI{5}{\milli\second}$ and verified in
+\textit{Simulink} under step and disturbance inputs.
+
+\subsection{Experimental Validation}
+
+The best-performing discrete-time controller was implemented on the
+\textit{kitprog059} platform. Step reference signals and input disturbances were
+applied to evaluate settling time, overshoot, and steady-state error under real
+operating conditions.
+
+
+\section{Results}
+
+
+\subsection{Continuous-Time Simulation Results}
+
+Figure~\ref{fig:continuous_step} shows the step response of the three
+continuous-time PI controllers. PI$_1$ and PI$_2$ met the specifications, achieving
+settling times of \SI{310}{\milli\second} and \SI{391}{\milli\second} respectively,
+both with zero overshoot.
+
+\begin{figure}[H]
     \centering
-    \begin{gnuplot}[terminal=pdf,terminaloptions={font ",20" linewidth 3},scale=0.70]
-    set grid
-	set ylabel 'Amplitud (V)'
-	set xlabel 'Frecuencia rad/s'
-	plot sin(x), cos(x), tan(x)
-    \end{gnuplot}
-    \caption{Relación de tensión-corriente para una bobina, utilizando una señal senoidal con una frecuencia de $f$ = 1 GHz.}
-    \label{Methodolody}
+    \includegraphics[width=\columnwidth]{figures/continuous_step.png}
+    \caption{Step response of the three continuous-time PI controllers in Simulink.}
+    \label{fig:continuous_step}
 \end{figure}
 
-\section{Conclusiones}
- En la sección de conclusiones, es importante responder de manera sistemática los objetivos de la práctica dirigida partiendo desde el general hasta los específicos en prosa nunca en viñetas, para este tipo de documentos como tal. Además de los objetivos, de los resultados experimentales obtenidos y analizados previamente se debe concluir aspectos relevantes que ayuden a dar solidez del artículo o informe, por lo general es necesario ver comparaciones importante a nivel cuantitativo y no cualitativo evitando frases genéricas. Finalmente resultados no obtenidos ni discutidos en el artículo e informe no deberán aparecer en las conclusiones debido a que no tiene sentido alguno discutir de algo que no se llevó acabo.
+\subsection{Discrete-Time Simulation Results}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Bibliography
-\bibliographystyle{IEEEtran}
-\bibliography{Paper}
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+Figure~\ref{fig:discrete_step} presents the step response of the best discrete-time
+controller (PI$_1$), which achieved $t_s = \SI{265}{\milli\second}$ and
+$M_p = 0.49\%$, both within specifications.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\columnwidth]{figures/discrete_step.png}
+    \caption{Step response of the best discrete-time PI controller in Simulink.}
+    \label{fig:discrete_step}
+\end{figure}
+
+\subsection{Experimental Results}
+
+Figure~\ref{fig:exp_step_c} shows the experimental step response of the
+continuous-time PI controllers implemented on the \textit{kitprog059} platform.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\columnwidth]{figures/experimental_step_c.png}
+    \caption{Experimental step response of the PI controllers on the
+    \textit{kitprog059} platform (continuous-time implementation).}
+    \label{fig:exp_step_c}
+\end{figure}
+
+Figure~\ref{fig:exp_step_d} presents the corresponding experimental step response
+for the discrete-time implementation.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\columnwidth]{figures/experimental_step_d.png}
+    \caption{Experimental step response of the PI controllers on the
+    \textit{kitprog059} platform (discrete-time implementation).}
+    \label{fig:exp_step_d}
+\end{figure}
+
+\subsection{Performance Summary}
+
+Tables~\ref{tab:sim_performance} and~\ref{tab:exp_performance} summarize the
+performance metrics for simulation and experimental results respectively. Values of ~\ref{tab:exp_performance} have being obtained by the script in TECDigital.
+
+\begin{table}[H]
+    \centering
+    \caption{Simulation performance metrics of the designed PI controllers.}
+    \label{tab:sim_performance}
+    \begin{tabular}{ccccc}
+        \toprule
+        \textbf{Controller} & \textbf{Domain} &
+        \textbf{$t_s$ (ms)} & \textbf{$M_p$ (\%)} &
+        \textbf{$e_{ss}$} \\
+        \midrule
+        PI$_1$ & Continuous & 310  & 0    & 0 \\
+        PI$_2$ & Continuous & 391  & 0    & 0 \\
+        PI$_3$ & Continuous &      &      &   \\
+        \midrule
+        PI$_1$ & Discrete   & 265  & 0.49 & 0 \\
+        PI$_2$ & Discrete   & 370  & 0    & 0 \\
+        PI$_3$ & Discrete   & 370    &      &   \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+\begin{table}[H]
+    \centering
+    \caption{Experimental performance metrics of the designed PI controllers.}
+    \label{tab:exp_performance}
+    \begin{tabular}{ccccc}
+        \toprule
+        \textbf{Controller} & \textbf{Domain} &
+        \textbf{$t_s$ (ms)} & \textbf{$M_p$ (\%)} &
+        \textbf{$e_{ss}$} \\
+        \midrule
+        PI$_1$ & Continuous & 330 & 0.95 & ±0.0235 \\
+        PI$_2$ & Continuous & 315 & 0.83 & ±0.03 \\
+        PI$_3$ & Continuous & 330 & 1.26 & ±0.0313 \\
+        \midrule
+        PI$_1$ & Discrete   & 165 & 23.4 & ±0.034 \\
+        PI$_2$ & Discrete   & 180 & 2 & ±0.032 \\
+        PI$_3$ & Discrete   & 230 & 1.45 & ±0.0305 \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+
+\section{Discussion}
+
+
+\subsection{Statistical Analysis of Plant Identification}
+
+Tables~\ref{tab:velocity_results} and~\ref{tab:current_results} summarize the
+parameter estimation results. For the velocity model, the gain $K$ shows excellent
+repeatability (CV = 1.64\%), while the time constant $\tau$ presents high variability
+(CV = 47.14\%), likely caused by noise in the transient response and variability in
+initial motor conditions. For the current model, the situation reverses: $\tau$ is
+highly repeatable (CV = 4.61\%) whereas $K$ shows moderate dispersion (CV = 13.93\%).
+
+\begin{table}[H]
+\centering
+\caption{Experimental results for velocity model identification.}
+\label{tab:velocity_results}
+\resizebox{\columnwidth}{!}{%
+\begin{tabular}{ccccc}
+\toprule
+\textbf{Parameter} & \textbf{Rep.\,1} & \textbf{Rep.\,2} & \textbf{Rep.\,3} & \textbf{Statistics} \\
+\midrule
+$K$        & 1.3342 & 1.3708 & 1.3746 & $\mu=1.3598$,\ $s=0.0223$,\ $CV=1.64\%$ \\
+$\tau$ (s) & 0.2301 & 0.1099 & 0.1071 & $\mu=0.1490$,\ $s=0.0703$,\ $CV=47.14\%$ \\
+\bottomrule
+\end{tabular}}
+\end{table}
+
+\begin{table}[H]
+\centering
+\caption{Experimental results for current model identification.}
+\label{tab:current_results}
+\resizebox{\columnwidth}{!}{%
+\begin{tabular}{ccccc}
+\toprule
+\textbf{Parameter} & \textbf{Rep.\,1} & \textbf{Rep.\,2} & \textbf{Rep.\,3} & \textbf{Statistics} \\
+\midrule
+$K$        & 0.1644 & 0.1326 & 0.1282 & $\mu=0.1418$,\ $s=0.0197$,\ $CV=13.93\%$ \\
+$\tau$ (s) & 0.1090 & 0.1081 & 0.1174 & $\mu=0.1115$,\ $s=0.0051$,\ $CV=4.61\%$ \\
+\bottomrule
+\end{tabular}}
+\end{table}
+
+Table~\ref{tab:rmse_results} shows that the model from Rep.\,3 achieves the lowest
+validation RMSE (0.2113), making it the best compromise between fit accuracy and
+generalization. The Rep.\,1 model, despite the lowest training error (0.0952),
+exhibits the highest validation RMSE (0.4089), indicating overfitting.
+
+\begin{table}[H]
+\centering
+\caption{Training and validation RMSE for the identified transfer functions.}
+\label{tab:rmse_results}
+\resizebox{\columnwidth}{!}{%
+\begin{tabular}{cccc}
+\toprule
+\textbf{Training} & \textbf{Validation} & \textbf{RMSE (fit)} & \textbf{RMSE (val.)} \\
+\midrule
+Rep.\,1 & Rep.\,2, 3 & 0.0952 & 0.4089 \\
+Rep.\,2 & Rep.\,1, 3 & 0.1122 & 0.2220 \\
+Rep.\,3 & Rep.\,1, 2 & 0.1114 & 0.2113 \\
+\bottomrule
+\end{tabular}}
+\end{table}
+
+\subsection{Noise Analysis}
+
+The angular speed signal was analyzed during closed-loop operation under a
+step input with disturbance, sampled at \SI{100}{\hertz} over a total duration
+of \SI{17.87}{\second} (1787 samples). Figure~\ref{fig:noise} shows the
+time-domain signal along with its power spectral density (PSD).
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\columnwidth]{figures/noise_analysis.png}
+    \caption{Noise Analysis.}
+    \label{fig:noise}
+\end{figure}
+
+The signal mean was \SI{3920}{RPM} against a setpoint of \SI{4000}{RPM},
+yielding a static error of only \SI{-80}{RPM} ($-2\%$), which confirms
+the integral action effectively eliminates steady-state error in practice.
+The standard deviation was $\sigma = \SI{490}{RPM}$ and the peak-to-peak
+amplitude reached \SI{4390}{RPM}, representing 12.3\% of the reference
+speed. The RMSE with respect to the setpoint was \SI{500}{RPM},
+consistent with the $\sigma$ value given the near-zero mean error.
+
+Spectral analysis revealed a dominant frequency component at
+\SI{0.168}{\hertz} with an amplitude of \SI{190}{RPM}, suggesting the
+disturbance is not purely random but contains a low-frequency oscillatory
+component, likely associated with mechanical load periodicity or
+commutator switching. The total noise power estimated from the PSD was
+\SI{2e4}{RPM\squared}, yielding a signal-to-noise ratio of
+\SI{18.04}{\decibel}. This moderate SNR explains the high coefficient
+of variation observed for $\tau$ in velocity model identification
+(CV = 47.14\%): the transient slope estimation is sensitive to the
+low-frequency component at \SI{0.168}{\hertz}, which distorts the
+apparent settling behavior and inflates the variance of $\tau$ across
+repetitions. The current model, whose transient is faster and less
+affected by this component, showed a much lower variability
+(CV = 4.61\% for $\tau$). These results suggest that a pre-identification
+low-pass filter or signal averaging could reduce $\tau$ uncertainty in
+future experiments.
+
+\subsection{Experimental versus Simulation Results}
+
+The experimental results reveal discrepancies with respect to simulation predictions,
+as expected from a first-order model that does not capture friction, dead zone, or
+amplifier nonlinearities.
+ 
+For the continuous-time controllers, the experimental settling times were
+\SI{330}{\milli\second}, \SI{315}{\milli\second}, and \SI{330}{\milli\second} for
+PI$_1$, PI$_2$, and PI$_3$ respectively, compared to simulated values of
+\SI{310}{\milli\second} and \SI{391}{\milli\second} for PI$_1$ and PI$_2$. The
+deviations are moderate and within the same order of magnitude, indicating that the
+identified first-order model captures the dominant dynamics adequately. All three
+continuous-time controllers remained within the \SI{3}{\percent} overshoot
+specification experimentally (0.95\%, 0.83\%, and 1.26\% for PI$_1$, PI$_2$, and
+PI$_3$ respectively), confirming the validity of the root-locus design for this
+implementation domain. The non-zero steady-state error observed ($e_{ss} \approx
+\pm 0.02$--$0.03$) is attributed to sensor quantization and measurement noise at the
+operating speed, rather than a structural failure of the integral action.
+ 
+The discrete-time controllers showed a more pronounced divergence from simulation.
+PI$_2$ and PI$_3$ met the overshoot specification with 2.0\% and 1.45\% respectively,
+and achieved settling times of \SI{180}{\milli\second} and \SI{230}{\milli\second},
+both below the simulated values, suggesting that the real plant dynamics are slightly
+faster than the identified model at this operating point. In contrast, PI$_1$ exhibited
+an overshoot of 23.4\%, far exceeding the \SI{3}{\percent} specification despite
+meeting it in simulation (\SI{0.49}{\percent}). This anomalous behavior is consistent
+with the zero placement of PI$_1$ being closest to the plant pole, which makes the
+closed-loop response more sensitive to model mismatch and to the quantization effects
+inherent in discrete implementation at $T_s = \SI{5}{\milli\second}$. The interaction
+between the low-frequency noise component identified at \SI{0.168}{\hertz} and the
+aggressive gain of PI$_1$ likely amplified the transient overshoot under real
+conditions. PI$_2$ therefore emerges as the best overall discrete-time design,
+satisfying all specifications in both simulation and experiment with the best
+generalization to the real plant.
+
+Additionally, a discrepancy was observed when comparing the performance metrics
+reported in Tables~\ref{tab:sim_performance} and~\ref{tab:exp_performance} with
+those obtained from the graphical analysis using a Python-based script. In
+particular, for the continuous-time response shown in Figure~\ref{fig:exp_step_c},
+the settling time was approximately \SI{715}{\milli\second} with an overshoot of
+2.5\%, which, although still within the specified limits, differs significantly
+from the values reported using the TECDigital script. A similar situation was
+observed in Figure~\ref{fig:exp_step_d}, where the settling time was approximately
+\SI{810}{\milli\second} and the overshoot reached 2.6\%. 
+
+In both cases, the steady-state error remained within the required bounds,
+indicating that the integral action was still effective. However, these
+differences suggest that the TECDigital script may produce inaccurate estimates
+of settling time and overshoot, and therefore may not fully reflect the actual
+dynamic response of the controller. This highlights the importance of validating
+automated performance metrics with direct analysis of the system response.
+
+
+\section{Conclusions}
+
+\begin{thebibliography}{99}
+
+\bibitem{ogata}
+K. Ogata, \textit{Modern Control Engineering}, 5th ed.
+Upper Saddle River, NJ: Prentice Hall, 2010.
+
+\bibitem{nise}
+N. S. Nise, \textit{Control Systems Engineering}, 7th ed.
+Hoboken, NJ: Wiley, 2015.
+
+\bibitem{guia}
+E. Interiano and A. Ruiz, ``Proyecto Corto: Control de velocidad
+angular del motor CD hps5130,'' Laboratorio de Control Automático,
+EL-5409, Escuela de Ingeniería en Electrónica, Instituto Tecnológico
+de Costa Rica, San José, Costa Rica, Mar. 2025.
+
+\end{thebibliography}
 \end{document}
-
-
