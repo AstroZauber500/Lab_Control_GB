@@ -41,34 +41,7 @@ Instituto Tecnológico de Costa Rica (ITCR), 30101 Cartago, Costa Rica \\
 \maketitle
 
 \begin{abstract}
-Faltaria hacer esta parte......................................................
-......................................................
-......................................................
-......................................................
-......................................................
-......................................................
-......................................................
-......................................................
-......................................................
-......................................................
-......................................................
-......................................................
-......................................................\\
-......................................................
-......................................................
-......................................................
-......................................................
-......................................................
-......................................................
-......................................................
-......................................................
-......................................................
-......................................................
-......................................................
-......................................................
-......................................................
-......................................................\\
-......................................................
+This project presents the design, simulation, and experimental validation of a proportional–integral (PI) controller for the angular speed of a DC motor. The plant was identified through repeated measurements and statistical analysis. The design of the controller was based on root-locus techniques, to satisfy the design specifications. Implementation was in both domains, continuous and discrete. The simulation results obtained in Simulink show that the design meets the specifications. The best controller obtained a settling time of 265 ms and an overshoot of 0.49\% in simulation, while maintaining acceptable performance experimentally. The experimental implementation shows discrepancies due to model limitations, particularly in the discrete domain. Additionally, distortions in the physical plant response and measurement noise affect system performance. For this reason, this work studies the impact of noise on the results and its influence on the overall system behavior.
 
 \end{abstract}
 
@@ -119,6 +92,14 @@ where $K_P$ sets the response speed, $K_I$ eliminates steady-state error, and $z
 is the controller zero whose position relative to the plant pole shapes the
 closed-loop dynamics~\cite{nise}.
 
+\subsection{Block Diagram}
+
+\begin{figure}[ht]
+\centering
+\includegraphics[width=0.5\textwidth]{Diagrama1}
+\caption{Closed loop system with PI Controller.}
+\label{fig:Diagram}
+\end{figure}
 
 \subsection{Root-Locus Design}
 
@@ -180,11 +161,68 @@ operating conditions.
 
 \section{Results}
 
+\subsection{Model Selection Results}
+
+As a result of the statistical analysis, the model obtained from Rep.~3 was selected as the best representation of the plant. The identified transfer function is given by:
+
+\begin{equation}
+		G(s) = \frac{12.535}{s + 9.165}
+    \label{eq:plant_model}
+\end{equation}
+
+
+
+This model achieved an average fit of approximately 90\% based on the experimental data.
+
+\subsection{PI Controller results}
+
+According to the plant model, the continuous PI parameter are displayed in Table \ref{tab:C_PI_parameters}. 
+
+\begin{table}[H]
+\centering
+\caption{Continuous-time PI controller parameters.}
+\label{tab:C_PI_parameters}
+\small
+\begin{tabular}{ccc}
+\toprule
+\textbf{PI Controller} & \textbf{$K_c$} & \textbf{$z_0$} \\
+\midrule
+PI1 & 1.0707 & -9.4 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{equation}
+    PI(s) = \frac{1.0707 \cdot (s + 9.4)}{s}
+    \label{eq:pi_continuo_fun}
+\end{equation}
+
+The discrete PI parameters are displayed in Table \ref{tab:D_PI_parameters}. 
+
+\begin{table}[H]
+\centering
+\caption{Discrete-time PI controller parameters.}
+\label{tab:D_PI_parameters}
+\small
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{cccc}
+\toprule
+\textbf{PI Controller} & \textbf{$b_1$} & \textbf{$b_0$} & \textbf{$a_0$} \\
+\midrule
+PI1 & 1.222 & 1.178 & -1 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{equation}
+    PI(z) = \frac{1.222 z + 1.178}{z - 1}
+    \label{eq:pi_discreto_fun}
+\end{equation}
 
 \subsection{Continuous-Time Simulation Results}
 
-Figure~\ref{fig:continuous_step} shows the step response of the three
-continuous-time PI controllers. PI$_1$ and PI$_2$ met the specifications, achieving
+Figure~\ref{fig:continuous_step} shows the step response of the third
+continuous-time PI controllers. PI met the specifications, achieving
 settling times of \SI{310}{\milli\second} and \SI{391}{\milli\second} respectively,
 both with zero overshoot.
 
@@ -436,6 +474,12 @@ automated performance metrics with direct analysis of the system response.
 
 
 \section{Conclusions}
+
+This work demonstrates the effectiveness of a PI controller for DC motor speed regulation. The plant was identified as a first-order system using experimental data, and the statistical analysis provided an adequate representation of the system dynamics. By applying pole cancellation and root-locus techniques, the closed-loop system met the specified performance requirements in simulation, including settling time and overshoot.
+
+Nevertheless, experimental validation revealed discrepancies caused by model limitations and unmodeled effects in the physical system, such as noise. These findings underscore the importance of considering real-world conditions during the controller design process. As a first attempt at controlling a real plant, the model proved useful, but it also highlighted the gap between simulation and practice. In particular, noise and modeling uncertainties must be addressed when designing control systems for practical applications like DC motor angular velocity regulation. Ignoring these factors risks producing controllers that perform well in simulation but fail to deliver the desired behavior in real implementations.
+
+Therefore, future work should explore robust controller design, incorporate signal filtering, and improve system modeling to enhance performance and reliability. Beyond the technical aspects, this project also served as a valuable learning experience, showing how theory and practice often diverge and reminding us that engineering solutions must adapt to the imperfections of real-world systems.
 
 \begin{thebibliography}{99}
 
