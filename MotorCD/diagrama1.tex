@@ -19,24 +19,21 @@
 \node[sum] (sum) {};
 
 % Bloques
-\node[block, right=of sum, minimum width=1.5cm] (int) {C. Integrador};
+\node[block, right=of sum, minimum width=1.5cm] (int) {PI controller};
 
-\node[block, right=of int, minimum width=1.5cm] (lead) {C. Adelanto};
-
-\node[block, right=of lead, minimum width=3.5cm] (plant)
-{\huge $\frac{s+2}{(s+1.5)(s+3)(s+5)}$};
+\node[block, right=of int, minimum width=3.5cm] (plant)
+{ $G(s)$};
 
 % Salida
 \node[right=of plant] (y) {$Y(s)$};
 
 % Sensor
-\node[block, below=2cm of lead] (sensor) {$0.5$};
+\node[block, below=2cm of int] (sensor) {$1$};
 
 % Conexiones
 \draw[->] (-1,0) -- (sum);
 \draw[->] (sum) -- (int);
-\draw[->] (int) -- (lead);
-\draw[->] (lead) -- (plant);
+\draw[->] (int) -- (plant);
 \draw[->] (plant) -- (y);
 
 % Realimentación
