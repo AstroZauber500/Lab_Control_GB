@@ -41,7 +41,7 @@ Instituto Tecnológico de Costa Rica (ITCR), 30101 Cartago, Costa Rica \\
 \maketitle
 
 \begin{abstract}
-This project presents the design, simulation, and experimental validation of a proportional–integral (PI) controller for the angular speed of a DC motor. The plant was identified through repeated measurements and statistical analysis. The design of the controller was based on root-locus techniques, to satisfy the design specifications. Implementation was in both domains, continuous and discrete. The simulation results obtained in Simulink show that the design meets the specifications. The best controller obtained a settling time of 265 ms and an overshoot of 0.49\% in simulation, while maintaining acceptable performance experimentally. The experimental implementation shows discrepancies due to model limitations, particularly in the discrete domain. Additionally, distortions in the physical plant response and measurement noise affect system performance. For this reason, this work studies the impact of noise on the results and its influence on the overall system behavior.
+This project presents the design, simulation, and experimental validation of a proportional–integral (PI) controller for the angular speed of a DC motor. The plant was identified through repeated measurements and statistical analysis. The design of the controller was based on root-locus techniques, to satisfy the design specifications. The controller was implemented in both continuous and discrete domain. Simulation results obtained in Simulink demonstrate that the design meets the specifications. The best controller achieved a settling time of 265 ms and an overshoot of 0.49\% in simulation, while maintaining acceptable performance experimentally. The experimental implementation shows discrepancies due to model limitations, particularly in the discrete domain. Additionally, distortions in the physical plant response and measurement noise affect system performance. For this reason, this work studies the impact of noise on the results and its influence on the overall system behavior.
 
 \end{abstract}
 
@@ -135,11 +135,10 @@ the settling time, ensuring adequate dynamic representation~\cite{ogata,nise}.
 
 Three CSV datasets were collected from the \textit{hps5130} motor under the same
 operating conditions. A statistical analysis (mean, standard deviation, and
-coefficient of variation) determined the most representative dataset, which was
+coefficient of variation) was used to determine the most representative dataset, which was
 then used to identify an empirical first-order model via the
 \textit{System Identification} toolbox in MATLAB, following \eqref{eq:modelo_motor}.
-The RMSE computed over the remaining datasets served as the generalization criterion
-for model selection.
+The RMSE computed over the remaining datasets was used as the generalization criterion for model selection.
 
 \subsection{PI Controller Design}
 
@@ -174,9 +173,9 @@ As a result of the statistical analysis, the model obtained from Rep.~3 was sele
 
 This model achieved an average fit of approximately 90\% based on the experimental data.
 
-\subsection{PI Controller results}
+\subsection{PI Controller Results}
 
-According to the plant model, the continuous PI parameter are displayed in Table \ref{tab:C_PI_parameters}. 
+According to the plant model, the continuous PI parameter for the selected controller are displayed in Table \ref{tab:C_PI_parameters}. 
 
 \begin{table}[H]
 \centering
@@ -197,7 +196,7 @@ PI1 & 1.0707 & -9.4 \\
     \label{eq:pi_continuo_fun}
 \end{equation}
 
-The discrete PI parameters are displayed in Table \ref{tab:D_PI_parameters}. 
+The discrete PI parameters for the controller are displayed in Table \ref{tab:D_PI_parameters}. 
 
 \begin{table}[H]
 \centering
@@ -273,7 +272,7 @@ for the discrete-time implementation.
 \subsection{Performance Summary}
 
 Tables~\ref{tab:sim_performance} and~\ref{tab:exp_performance} summarize the
-performance metrics for simulation and experimental results respectively. Values of ~\ref{tab:exp_performance} have being obtained by the script in TECDigital.
+performance metrics for simulation and experimental results respectively. Values in Table ~\ref{tab:exp_performance} were  obtained using a script in TECDigital.
 
 \begin{table}[H]
     \centering
@@ -404,9 +403,7 @@ speed. The RMSE with respect to the setpoint was \SI{500}{RPM},
 consistent with the $\sigma$ value given the near-zero mean error.
 
 Spectral analysis revealed a dominant frequency component at
-\SI{0.168}{\hertz} with an amplitude of \SI{190}{RPM}, suggesting the
-disturbance is not purely random but contains a low-frequency oscillatory
-component, likely associated with mechanical load periodicity or
+\SI{0.168}{\hertz} with an amplitude of \SI{190}{RPM}, suggesting that the disturbance is not purely random but contains a dominant low-frequency oscillatory component, likely associated with mechanical load periodicity or
 commutator switching. The total noise power estimated from the PSD was
 \SI{2e4}{RPM\squared}, yielding a signal-to-noise ratio of
 \SI{18.04}{\decibel}. This moderate SNR explains the high coefficient
@@ -477,7 +474,7 @@ automated performance metrics with direct analysis of the system response.
 
 This work demonstrates the effectiveness of a PI controller for DC motor speed regulation. The plant was identified as a first-order system using experimental data, and the statistical analysis provided an adequate representation of the system dynamics. By applying pole cancellation and root-locus techniques, the closed-loop system met the specified performance requirements in simulation, including settling time and overshoot.
 
-Nevertheless, experimental validation revealed discrepancies caused by model limitations and unmodeled effects in the physical system, such as noise. These findings underscore the importance of considering real-world conditions during the controller design process. As a first attempt at controlling a real plant, the model proved useful, but it also highlighted the gap between simulation and practice. In particular, noise and modeling uncertainties must be addressed when designing control systems for practical applications like DC motor angular velocity regulation. Ignoring these factors risks producing controllers that perform well in simulation but fail to deliver the desired behavior in real implementations.
+Nevertheless, experimental validation revealed discrepancies caused by model limitations and unmodeled effects in the physical system, such as noise. These findings underscore the importance of considering real-world conditions during the controller design process. As an initial attempt at controlling a real plant, the model proved useful, but it also highlighted the gap between simulation and practice. In particular, noise and modeling uncertainties must be addressed when designing control systems for practical applications like DC motor angular velocity regulation. Ignoring these factors risks producing controllers that perform well in simulation but fail to deliver the desired behavior in real implementations.
 
 Therefore, future work should explore robust controller design, incorporate signal filtering, and improve system modeling to enhance performance and reliability. Beyond the technical aspects, this project also served as a valuable learning experience, showing how theory and practice often diverge and reminding us that engineering solutions must adapt to the imperfections of real-world systems.
 
