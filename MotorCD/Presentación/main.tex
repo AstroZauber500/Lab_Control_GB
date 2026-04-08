@@ -70,6 +70,9 @@
 \usepackage{chngcntr}
 \usepackage[utf8]{inputenc} 
 \usepackage[spanish]{babel}
+\usepackage{ragged2e}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
 
 % Titulo principal del portada de la diapositiva
 
@@ -195,16 +198,34 @@ Laboratorio de Control Automático} %
     				\textit{kitprog059} platform (discrete-time implementation).}
     				\label{fig:exp_step_d}
 			\end{figure}
+			
+			\begin{figure}[H]
+    				\centering
+    				\includegraphics[width=10cm]{noise_analysis1.png}
+    				\caption{Noise analysis graph 1}
+    				\label{noise_analysis1}
+
+			\end{figure}
+
+			\begin{figure}[H]
+					\centering
+					\includegraphics[width=10cm]{noise_analysis2.png}
+    				\caption{Noise analysis graph 2.}
+    				\label{fig:noise_analysis2}
+			\end{figure}
+
+		
 
 \section{Conclusiones}              % Sección de conclusiones
     \subsection{Conclusiones}       % Subsección de conclusiones
         \begin{frame}{Conclusiones}
-            Se concluye lo alcanzado en el desarrollo del laboratorio, además no queda demás de resaltar lo aprendido en el laboratorio, no olvidar deben ser en \textbf{prosa} no \textbf{puntuales}.
+            Este trabajo validó un controlador PI para la regulación de velocidad de un motor DC usando un modelo de primer orden. La simulación cumplió los objetivos, sin embargo el experimento evidenció ruido y limitaciones, destacando la necesidad de control robusto, filtrado y mejor modelado.
         \end{frame}
 
     \subsection{Recomendaciones}    % Subsección de recomendaciones
         \begin{frame}{Recomendaciones}
-            Se le pide al menos, que expongan algunas limitaciones que tuvieron a la hora de realizar el laboratorio y expongan alguna recomendación para mejoras a futuro del laborotario.
+            Dentro del laboratorio se evidenciaron limitaciones por ruido en las pruebas, además de la variabilidad para identificar un modelo \\
+            especifico de la planta. 
         \end{frame}
 %------------------------------------------------
 
@@ -216,18 +237,12 @@ Laboratorio de Control Automático} %
                 \justifying
                 \bibitem{Script}
                 Script del curso.
-                \bibitem{Sze}
-                Sze S. M. Semiconductor Devices: Physics and Technology, 2 Ed. Wiley,2002.
-                \bibitem{Albella}
-                Albella et al. Fundamentos de microelectr\'onica,nanoelectr\'onica y fot\'onica. Prentice Hall.
-                \bibitem{Rubio}
-                Rubio et al. Dise\~no de circuitos y sistemas integrados. Alfaomega.
-                \bibitem{Sedra}
-                Sedra, K Smith. Circuitos Microelectr\'onicos. Segunda Edici\'on. Mc. Graw-Hill
-                \bibitem{Pierret}
-                R. Pierret. Fundamentos de Semiconductores. Colecci\'on Temas Selectos de Ingenier\'ia. Adisson-Wesley Iberoamericana.
-                \bibitem{Neudeck}
-                G. Neudeck. El transistor bipolar de uni\'on. Colecci\'on Temas Selectos de Ingenier\'ia. Adisson-Wesley Iberoamericana.
+                \bibitem{Ogata}
+                K. Ogata, \textit{Modern Control Engineering}, 5th ed. Upper Saddle River, NJ: Prentice Hall, 2010.
+                \bibitem{Nise}
+                N. S. Nise, \textit{Control Systems Engineering}, 7th ed. Hoboken, NJ: Wiley, 2015.
+                \bibitem{Interiano}
+                E. Interiano and A. Ruiz, ``Proyecto Corto: Control de velocidad angular del motor CD hps5130,'' Laboratorio de Control Automático, EL-5409, Escuela de Ingeniería en Electrónica, Instituto Tecnológico de Costa Rica, San José, Costa Rica, Mar. 2025.
                 \end{thebibliography}
                 }
         \end{frame}          
