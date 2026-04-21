@@ -1,0 +1,510 @@
+\documentclass[conference]{IEEEtran}
+
+\usepackage{amsmath, amssymb}
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{booktabs}
+\usepackage[spanish]{babel}
+\usepackage[utf8]{inputenc}
+
+%------------------------------------------------
+\begin{document}
+
+\title{Identificación y Control de un Péndulo Amortiguado a Hélice (PAMH)}
+
+\author{
+  \IEEEauthorblockN{Nombre del Estudiante}
+  \IEEEauthorblockA{Institución \\
+  Correo electrónico}
+}
+
+\maketitle
+
+%================================================
+%  RESUMEN
+%================================================
+\begin{abstract}
+% -----------------------------------------------------------------
+% QUÉ ESCRIBIR AQUÍ:
+%   • Una oración que presente el sistema bajo estudio (PAMH) y su
+%     relevancia en ingeniería de control.
+%   • Describir brevemente el proceso de identificación experimental:
+%     tres muestras tomadas, métodos de aproximación de parámetros
+%     (amortiguamiento y frecuencia natural) y uso del toolbox de
+%     System Identification de MATLAB.
+%   • Mencionar la detección y descarte de la muestra 3 por
+%     perturbaciones (apoyado en análisis estadístico), y cómo se
+%     obtuvo la planta final como promedio de las 4 FT restantes.
+%   • Resumir los cuatro controladores diseñados: PID continuo
+%     (SISOtool), LQR con acción integral, I-PD por ubicación de
+%     polos y PID discreto (SISOtool).
+%   • Indicar el resultado principal: si cada controlador cumplió o
+%     no las especificaciones (ts ≤ 5 s, Mp ≤ 3 %) en la
+%     implementación física.
+%   • Extensión sugerida: 100–150 palabras.
+% -----------------------------------------------------------------
+Este trabajo presenta la identificación experimental y el diseño de controladores para un péndulo amortiguado a hélice (PAMH). Se adquirieron tres conjuntos de datos y se obtuvieron funciones de transferencia mediante aproximación de parámetros y la herramienta System Identification de MATLAB. Un análisis estadístico descartó la muestra con perturbaciones, y la planta final se calculó como el promedio de los modelos restantes. Se diseñaron cuatro controladores (PID continuo, REI por LQR, I-PD por ubicación de polos y PID discreto) y se validaron físicamente frente a especificaciones de tiempo de asentamiento de 5 s y sobrevalor del 3\%. Continua con el analisis.....
+\end{abstract}
+
+%================================================
+%  1. INTRODUCCIÓN
+%================================================
+\section{Introducción}
+% -----------------------------------------------------------------
+% QUÉ ESCRIBIR AQUÍ:
+%   • Contextualizar el sistema PAMH: qué es, cómo funciona
+%     físicamente (hélice que genera par, péndulo con amortiguamiento).
+%   • Motivación del trabajo: importancia de identificar correctamente
+%     la dinámica antes de diseñar un controlador.
+%   • Breve estado del arte o referencia a técnicas similares
+%     (identificación paramétrica, control PID, LQR, ubicación de polos).
+%   • Plantear el problema: sistema de orden 2 subamortiguado que debe
+%     cumplir ts ≤ 5 s y Mp ≤ 3 %.
+%   • Describir brevemente la estructura del informe
+%     (identificación → análisis estadístico → diseño → validación).
+% -----------------------------------------------------------------
+El control de sistemas dinámicos como el péndulo amortiguado a hélice (PAMH) representa un caso de estudio relevante en ingeniería de control, pues combina dinámica oscilatoria con accionamiento mediante hélice. Este trabajo aborda la identificación experimental del sistema y el diseño de múltiples estrategias de control orientadas a satisfacer especificaciones de desempeño definidas. El documento se organiza en las siguientes etapas: adquisición y procesamiento de datos, identificación del modelo de planta, diseño de controladores y validación experimental.
+
+%================================================
+%  2. IDENTIFICACIÓN DEL SISTEMA
+%================================================
+\section{Identificación del Sistema}
+
+%------------------------------------------------
+\subsection{Adquisición de Datos Experimentales}
+% -----------------------------------------------------------------
+% QUÉ ESCRIBIR AQUÍ:
+%   • Describir el banco experimental: hardware, sensor de ángulo,
+%     actuador (motor + hélice), DAQ utilizada.
+%   • Señal de excitación aplicada (escalón, PRBS, etc.) y su amplitud.
+%   • Número de muestras tomadas (3), frecuencia de muestreo y
+%     duración de cada experimento.
+%   • Condiciones de operación (temperatura, punto de equilibrio,
+%     restricciones de ángulo).
+% -----------------------------------------------------------------
+Se realizaron tres experimentos independientes sobre el PAMH para capturar la respuesta dinámica del sistema bajo condiciones nominales. En cada ensayo se aplicó una señal de excitación y se registró la respuesta angular del péndulo.
+
+% -----------------------------------------------------------------
+% GRÁFICA SUGERIDA:
+% \begin{figure}[H]
+%   \centering
+%   \includegraphics[width=0.45\textwidth]{datos_experimentales.png}
+%   \caption{Respuesta temporal de las tres muestras adquiridas.}
+%   \label{fig:datos_exp}
+% \end{figure}
+% -----------------------------------------------------------------
+
+%------------------------------------------------
+\subsection{Aproximación de Parámetros}
+% -----------------------------------------------------------------
+% QUÉ ESCRIBIR AQUÍ:
+%   • Describir el método de lectura gráfica o analítica utilizado
+%     para estimar ωn (frecuencia natural) y ζ (amortiguamiento) a
+%     partir de la respuesta temporal (método de decremento logarítmico,
+%     lectura del sobrevalor y tiempo de pico, etc.).
+%   • Mostrar las ecuaciones empleadas, por ejemplo:
+%       ζ = ln(Mp) / sqrt(π² + ln²(Mp))
+%       ωn = π / (tp · sqrt(1 - ζ²))
+%   • Presentar los resultados de ωn y ζ para cada una de las 3 muestras.
+%   • A partir de los parámetros, construir las 3 FT de segundo orden:
+%       G_i(s) = K·ωn² / (s² + 2ζωn·s + ωn²)
+% -----------------------------------------------------------------
+A partir de los datos experimentales se estimaron los parámetros $\omega_n$ y $\zeta$ de cada muestra mediante análisis de la respuesta transitoria, obteniendo tres funciones de transferencia de la forma:
+
+\begin{equation}
+  G_i(s) = \frac{K\,\omega_{n,i}^2}{s^2 + 2\zeta_i\,\omega_{n,i}\,s + \omega_{n,i}^2}, \quad i = 1,2,3
+  \label{eq:ft_aprox}
+\end{equation}
+
+% -----------------------------------------------------------------
+% TABLA SUGERIDA:
+% \begin{table}[H]
+%   \centering
+%   \caption{Parámetros estimados por aproximación (3 muestras)}
+%   \begin{tabular}{cccc}
+%     \toprule
+%     Muestra & $\omega_n$ (rad/s) & $\zeta$ & $K$ \\
+%     \midrule
+%     1 & ... & ... & ... \\
+%     2 & ... & ... & ... \\
+%     3 & ... & ... & ... \\
+%     \bottomrule
+%   \end{tabular}
+%   \label{tab:params_aprox}
+% \end{table}
+% -----------------------------------------------------------------
+
+%------------------------------------------------
+\subsection{Identificación con System Identification (MATLAB)}
+% -----------------------------------------------------------------
+% QUÉ ESCRIBIR AQUÍ:
+%   • Explicar brevemente el flujo en el toolbox: importación de datos,
+%     selección de estructura del modelo (TF de 2° orden), criterio de
+%     ajuste (best fit %).
+%   • Indicar el best fit obtenido para cada muestra.
+%   • Presentar las tres FT resultantes de este método.
+%   • Comparar cualitativamente con las FT de la subsección anterior.
+% -----------------------------------------------------------------
+Adicionalmente, se utilizó el toolbox de System Identification de MATLAB para ajustar un modelo de función de transferencia de segundo orden a cada conjunto de datos, obteniendo tres modelos adicionales con sus respectivos porcentajes de ajuste (\textit{best fit}).
+
+% -----------------------------------------------------------------
+% TABLA SUGERIDA:
+% \begin{table}[H]
+%   \centering
+%   \caption{Funciones de transferencia obtenidas por System Identification}
+%   \begin{tabular}{ccc}
+%     \toprule
+%     Muestra & Función de transferencia & Best fit (\%) \\
+%     \midrule
+%     1 & $G_{SI,1}(s) = \ldots$ & ... \\
+%     2 & $G_{SI,2}(s) = \ldots$ & ... \\
+%     3 & $G_{SI,3}(s) = \ldots$ & ... \\
+%     \bottomrule
+%   \end{tabular}
+%   \label{tab:sysid}
+% \end{table}
+% -----------------------------------------------------------------
+
+% -----------------------------------------------------------------
+% GRÁFICA SUGERIDA — superposición datos medidos vs. modelo SYSID:
+% \begin{figure}[H]
+%   \centering
+%   \includegraphics[width=0.45\textwidth]{sysid_validacion.png}
+%   \caption{Validación de los modelos identificados: datos experimentales
+%            vs.\ respuesta simulada (System Identification).}
+%   \label{fig:sysid_val}
+% \end{figure}
+% -----------------------------------------------------------------
+
+%------------------------------------------------
+\subsection{Análisis Estadístico y Descarte de Muestra}
+% -----------------------------------------------------------------
+% QUÉ ESCRIBIR AQUÍ:
+%   • Describir las 6 FT disponibles (3 por aproximación + 3 por SYSID)
+%     y los parámetros numéricos que se comparan (ωn, ζ, K).
+%   • Presentar media y desviación estándar de cada parámetro.
+%   • Argumentar por qué los valores de la muestra 3 se alejan
+%     estadísticamente del resto (p.ej. > 2σ) a causa de una
+%     perturbación durante el experimento.
+%   • Concluir formalmente el descarte de las 2 FT asociadas a
+%     la muestra 3 (1 por aproximación + 1 por SYSID).
+% -----------------------------------------------------------------
+Con las seis funciones de transferencia disponibles se realizó un análisis estadístico de los parámetros identificados. Los resultados indicaron que las FT correspondientes a la muestra 3 se alejaban significativamente de la distribución del resto de los datos, evidenciando la presencia de una perturbación durante ese ensayo. Por lo tanto, la muestra 3 fue descartada del proceso de modelado.
+
+% -----------------------------------------------------------------
+% TABLA SUGERIDA — estadística de parámetros (con y sin muestra 3):
+% \begin{table}[H]
+%   \centering
+%   \caption{Análisis estadístico de los parámetros identificados}
+%   \begin{tabular}{lcccc}
+%     \toprule
+%     Parámetro & Media (6 FT) & $\sigma$ (6 FT) & Media (4 FT) & $\sigma$ (4 FT) \\
+%     \midrule
+%     $\omega_n$ & ... & ... & ... & ... \\
+%     $\zeta$    & ... & ... & ... & ... \\
+%     $K$        & ... & ... & ... & ... \\
+%     \bottomrule
+%   \end{tabular}
+%   \label{tab:estadistica}
+% \end{table}
+% -----------------------------------------------------------------
+
+%------------------------------------------------
+\subsection{Modelo Final de la Planta}
+% -----------------------------------------------------------------
+% QUÉ ESCRIBIR AQUÍ:
+%   • Explicar que el modelo final es el promedio de los parámetros
+%     (o de las FT directamente) de las 4 FT válidas.
+%   • Mostrar la FT final resultante con sus coeficientes numéricos.
+%   • Incluir un gráfico comparando la respuesta de las 4 FT válidas
+%     y la FT promedio final frente a los datos experimentales.
+% -----------------------------------------------------------------
+La planta final se obtuvo promediando los parámetros de las cuatro funciones de transferencia válidas:
+
+\begin{equation}
+  G(s) = \frac{K_{\text{prom}}\,\omega_{n,\text{prom}}^2}
+              {s^2 + 2\,\zeta_{\text{prom}}\,\omega_{n,\text{prom}}\,s + \omega_{n,\text{prom}}^2}
+  \label{eq:planta_final}
+\end{equation}
+
+% SUSTITUIR los valores numéricos una vez calculados:
+% \begin{equation}
+%   G(s) = \frac{\ldots}{s^2 + \ldots\,s + \ldots}
+% \end{equation}
+
+% -----------------------------------------------------------------
+% GRÁFICA SUGERIDA — 4 FT válidas + FT promedio vs. datos experimentales:
+% \begin{figure}[H]
+%   \centering
+%   \includegraphics[width=0.45\textwidth]{planta_final.png}
+%   \caption{Respuesta de las cuatro FT válidas, modelo promedio final y
+%            datos experimentales de las muestras 1 y 2.}
+%   \label{fig:planta_final}
+% \end{figure}
+% -----------------------------------------------------------------
+
+%================================================
+%  3. DISEÑO DE CONTROLADORES
+%================================================
+\section{Diseño de Controladores}
+
+Las especificaciones de diseño para todos los controladores son:
+\begin{itemize}
+  \item Tiempo de asentamiento: $t_s \leq 5$ s
+  \item Sobrevalor máximo: $M_p \leq 3\ $
+\end{itemize}
+
+%------------------------------------------------
+\subsection{PID Continuo (SISOtool)}
+% -----------------------------------------------------------------
+% QUÉ ESCRIBIR AQUÍ:
+%   • Describir el procedimiento en SISOtool: carga de la planta,
+%     ajuste automático del PID, visualización del lugar de raíces
+%     y diagrama de Bode.
+%   • Presentar los parámetros obtenidos: Kp, Ki, Kd.
+%   • Mostrar la respuesta al escalón en simulación con las
+%     métricas ts y Mp resultantes.
+%   • Indicar si cumple las especificaciones.
+% -----------------------------------------------------------------
+Se diseñó un controlador PID en tiempo continuo empleando la herramienta SISOtool de MATLAB con ajuste automático, partiendo del modelo de planta identificado.
+
+\begin{equation}
+  C_{\text{PID}}(s) = K_p + \frac{K_i}{s} + K_d\,s
+  \label{eq:pid_continuo}
+\end{equation}
+
+% -----------------------------------------------------------------
+% GRÁFICA SUGERIDA — respuesta al escalón simulada (PID continuo):
+% \begin{figure}[H]
+%   \centering
+%   \includegraphics[width=0.45\textwidth]{pid_cont_sim.png}
+%   \caption{Respuesta al escalón del sistema con PID continuo (simulación).}
+%   \label{fig:pid_cont_sim}
+% \end{figure}
+% -----------------------------------------------------------------
+
+%------------------------------------------------
+\subsection{Controlador LQR con Acción Integral}
+% -----------------------------------------------------------------
+% QUÉ ESCRIBIR AQUÍ:
+%   • Presentar el modelo en espacio de estados (A, B, C, D) usado.
+%   • Explicar la extensión del sistema para incluir el estado integral
+%     (estado aumentado).
+%   • Describir la selección de las matrices de ponderación Q y R y
+%     el criterio utilizado (ej. Bryson's rule).
+%   • Mostrar la ganancia K obtenida y la ganancia integral Ki.
+%   • Incluir respuesta al escalón simulada y métricas ts / Mp.
+% -----------------------------------------------------------------
+Se implementó un controlador de realimentación de estados con acción integral, diseñado mediante el criterio LQR. El sistema se extendió con un estado adicional que integra el error para asegurar seguimiento de referencia en régimen permanente.
+
+% -----------------------------------------------------------------
+% GRÁFICA SUGERIDA — respuesta al escalón simulada (LQR):
+% \begin{figure}[H]
+%   \centering
+%   \includegraphics[width=0.45\textwidth]{lqr_sim.png}
+%   \caption{Respuesta al escalón del sistema con controlador LQR-Integral
+%            (simulación).}
+%   \label{fig:lqr_sim}
+% \end{figure}
+% -----------------------------------------------------------------
+
+%------------------------------------------------
+\subsection{Controlador I-PD por Ubicación de Polos}
+% -----------------------------------------------------------------
+% QUÉ ESCRIBIR AQUÍ:
+%   • Justificar la estructura I-PD (integrador en feedforward,
+%     PD en realimentación) y su ventaja frente al PID clásico
+%     (evita derivative kick).
+%   • Definir los polos deseados a partir de las especificaciones
+%     ts y Mp → calcular ζ_d y ωn_d → polos dominantes deseados.
+%   • Mostrar el polinomio característico deseado y el procedimiento
+%     de igualación de coeficientes para obtener Kp, Kd, Ki.
+%   • Presentar la respuesta al escalón simulada.
+% -----------------------------------------------------------------
+El controlador I-PD se diseñó ubicando los polos en lazo cerrado en posiciones que satisfacen las especificaciones de desempeño.
+
+\begin{equation}
+  C_{\text{I-PD}}(s) = K_i\frac{1}{s} - (K_p + K_d\,s)
+  \label{eq:ipd}
+\end{equation}
+
+% -----------------------------------------------------------------
+% GRÁFICA SUGERIDA — respuesta al escalón simulada (I-PD):
+% \begin{figure}[H]
+%   \centering
+%   \includegraphics[width=0.45\textwidth]{ipd_sim.png}
+%   \caption{Respuesta al escalón del sistema con controlador I-PD
+%            por ubicación de polos (simulación).}
+%   \label{fig:ipd_sim}
+% \end{figure}
+% -----------------------------------------------------------------
+
+%------------------------------------------------
+\subsection{PID Discreto (SISOtool)}
+% -----------------------------------------------------------------
+% QUÉ ESCRIBIR AQUÍ:
+%   • Justificar la necesidad de un controlador discreto
+%     (implementación en microcontrolador/DSP).
+%   • Indicar el período de muestreo T elegido y el criterio
+%     de selección (regla del pulgar: T ≤ ts/10 … ts/20).
+%   • Describir el método de discretización utilizado en SISOtool
+%     (Tustin/bilineal, ZOH, etc.).
+%   • Presentar la ecuación en diferencias resultante y los
+%     parámetros Kp, Ki, Kd discretos.
+%   • Comparar brevemente con el PID continuo.
+% -----------------------------------------------------------------
+Adicionalmente, se diseñó un controlador PID en tiempo discreto mediante SISOtool con un período de muestreo $T = \ldots$ s, empleando el método de discretización \ldots
+
+% -----------------------------------------------------------------
+% GRÁFICA SUGERIDA — respuesta al escalón simulada (PID discreto):
+% \begin{figure}[H]
+%   \centering
+%   \includegraphics[width=0.45\textwidth]{pid_disc_sim.png}
+%   \caption{Respuesta al escalón del sistema con PID discreto (simulación).}
+%   \label{fig:pid_disc_sim}
+% \end{figure}
+% -----------------------------------------------------------------
+
+% -----------------------------------------------------------------
+% TABLA SUGERIDA — resumen de parámetros de todos los controladores:
+% \begin{table}[H]
+%   \centering
+%   \caption{Parámetros de los controladores diseñados}
+%   \begin{tabular}{lcccc}
+%     \toprule
+%     Controlador & $K_p$ & $K_i$ & $K_d$ & Observaciones \\
+%     \midrule
+%     PID continuo   & ... & ... & ... & SISOtool automático \\
+%     LQR-Integral   & --- & --- & --- & Ganancias $\mathbf{K}$, $K_i$ \\
+%     I-PD           & ... & ... & ... & Ubicación de polos \\
+%     PID discreto   & ... & ... & ... & $T = \ldots$ s \\
+%     \bottomrule
+%   \end{tabular}
+%   \label{tab:controladores}
+% \end{table}
+% -----------------------------------------------------------------
+
+%================================================
+%  4. RESULTADOS Y ANÁLISIS
+%================================================
+\section{Resultados y Análisis}
+% -----------------------------------------------------------------
+% QUÉ ESCRIBIR AQUÍ:
+%   • Para cada controlador presentar, en pares simulación/experimental,
+%     las gráficas de respuesta al escalón y señal de control.
+%   • Extraer de cada curva: ts (criterio del ±2% o ±5%), Mp (%),
+%     error en estado estacionario, tiempo de subida.
+%   • Construir una tabla comparativa de métricas simuladas vs.
+%     experimentales para los 4 controladores.
+%   • Indicar explícitamente si se cumple o no cada especificación
+%     (ts ≤ 5 s, Mp ≤ 3 %).
+%   • Describir el comportamiento de la señal de control (saturación,
+%     esfuerzo de control, ruido en derivada).
+%   • Para el PID discreto, comentar efectos de cuantización o
+%     aliasing observados.
+%   NOTA: No interpretar causas aquí — eso corresponde a la Discusión.
+% -----------------------------------------------------------------
+
+En esta sección se presentan los resultados obtenidos en simulación e implementación física para cada controlador, evaluando el cumplimiento de las especificaciones de desempeño ($t_s \leq 5$ s, $M_p \leq 3\ $).
+
+% -----------------------------------------------------------------
+% GRÁFICAS SUGERIDAS — para cada controlador (repetir bloque × 4):
+%
+% \begin{figure}[H]
+%   \centering
+%   \includegraphics[width=0.45\textwidth]{pid_cont_comp.png}
+%   \caption{PID continuo — respuesta simulada vs.\ experimental.}
+%   \label{fig:pid_cont_comp}
+% \end{figure}
+%
+% \begin{figure}[H]
+%   \centering
+%   \includegraphics[width=0.45\textwidth]{lqr_comp.png}
+%   \caption{LQR-Integral — respuesta simulada vs.\ experimental.}
+%   \label{fig:lqr_comp}
+% \end{figure}
+%
+% \begin{figure}[H]
+%   \centering
+%   \includegraphics[width=0.45\textwidth]{ipd_comp.png}
+%   \caption{I-PD — respuesta simulada vs.\ experimental.}
+%   \label{fig:ipd_comp}
+% \end{figure}
+%
+% \begin{figure}[H]
+%   \centering
+%   \includegraphics[width=0.45\textwidth]{pid_disc_comp.png}
+%   \caption{PID discreto — respuesta simulada vs.\ experimental.}
+%   \label{fig:pid_disc_comp}
+% \end{figure}
+% -----------------------------------------------------------------
+
+% -----------------------------------------------------------------
+% TABLA SUGERIDA — comparación de métricas simuladas vs. experimentales:
+%
+% \begin{table}[H]
+%   \centering
+%   \caption{Comparación de métricas de desempeño (simulación vs.\ experimental)}
+%   \begin{tabular}{llcccc}
+%     \toprule
+%     Controlador & Condición & $t_s$ (s) & $M_p$ (\%) & $e_{ss}$ & ¿Cumple? \\
+%     \midrule
+%     PID continuo & Simulación   & ... & ... & ... & Sí/No \\
+%                  & Experimental & ... & ... & ... & Sí/No \\
+%     \midrule
+%     LQR-Integral & Simulación   & ... & ... & ... & Sí/No \\
+%                  & Experimental & ... & ... & ... & Sí/No \\
+%     \midrule
+%     I-PD         & Simulación   & ... & ... & ... & Sí/No \\
+%                  & Experimental & ... & ... & ... & Sí/No \\
+%     \midrule
+%     PID discreto & Simulación   & ... & ... & ... & Sí/No \\
+%                  & Experimental & ... & ... & ... & Sí/No \\
+%     \bottomrule
+%   \end{tabular}
+%   \label{tab:comparacion}
+% \end{table}
+% -----------------------------------------------------------------
+
+%================================================
+%  5. DISCUSIÓN
+%================================================
+\section{Discusión}
+% -----------------------------------------------------------------
+% QUÉ ESCRIBIR AQUÍ:
+%   • Interpretar (no repetir) los resultados de la sección anterior.
+%   • Explicar las discrepancias entre simulación y experimento:
+%     no linealidades, fricción, zona muerta del actuador, retardo.
+%   • Analizar por qué un controlador supera a los demás en términos
+%     de robustez o facilidad de sintonía.
+%   • Relacionar el descarte de la muestra 3 con la importancia de
+%     la calidad de los datos en la identificación de sistemas.
+%   • Discutir el impacto del período de muestreo en el PID discreto.
+%   • Señalar limitaciones del modelo lineal de 2° orden frente al
+%     comportamiento real del PAMH.
+%   • Proponer mejoras: observador de estados, control adaptativo,
+%     mayor resolución del sensor, etc.
+% -----------------------------------------------------------------
+Esta sección discute e interpreta los resultados presentados en la sección anterior, analizando las causas de las diferencias observadas entre los modelos teóricos y el comportamiento físico del sistema, así como las ventajas y desventajas de cada estrategia de control implementada.
+
+%================================================
+%  6. CONCLUSIONES
+%================================================
+\section{Conclusiones}
+% -----------------------------------------------------------------
+% QUÉ ESCRIBIR AQUÍ:
+%   • Resumir los logros principales (identificación exitosa, número
+%     de controladores validados que cumplen especificaciones).
+%   • Indicar qué controlador resultó más adecuado y por qué
+%     (desempeño, facilidad de implementación, robustez).
+%   • Mencionar los desafíos encontrados (perturbación en muestra 3,
+%     diferencias simulación–experimento).
+%   • Reflexionar sobre el aprendizaje metodológico del proyecto
+%     (ciclo completo: datos → modelo → control → validación).
+%   • Proponer trabajos futuros: control no lineal, control en
+%     cascada, rechazo activo de perturbaciones, etc.
+% -----------------------------------------------------------------
+Este trabajo abarcó el ciclo completo de identificación y control de un sistema PAMH, desde la adquisición experimental de datos hasta la validación física de cuatro controladores. El proceso evidenció la importancia de un análisis estadístico riguroso para garantizar la calidad del modelo de planta, y permitió comparar el desempeño de estrategias de control con distinta complejidad de diseño.
+
+%================================================
+\end{document}
