@@ -13,9 +13,17 @@
 \title{Identificación y Control de un Péndulo Amortiguado a Hélice (PAMH)}
 
 \author{
-  \IEEEauthorblockN{Nombre del Estudiante}
-  \IEEEauthorblockA{Institución \\
-  Correo electrónico}
+\IEEEauthorblockN{
+Eric Castro Velásquez\IEEEauthorrefmark{1},
+Esteban Segura Garcia\IEEEauthorrefmark{1},
+Daniel Chavarria Garcia\IEEEauthorrefmark{1}
+}
+\vspace{2mm}
+\IEEEauthorblockA{
+\IEEEauthorrefmark{1}School of Electronics Engineering,
+Instituto Tecnológico de Costa Rica (ITCR), 30101 Cartago, Costa Rica \\
+\{ecastro, essegura, dachavarria\}@estudiantec.cr
+}
 }
 
 \maketitle
@@ -251,7 +259,7 @@ La planta final se obtuvo promediando los parámetros de las cuatro funciones de
 Las especificaciones de diseño para todos los controladores son:
 \begin{itemize}
   \item Tiempo de asentamiento: $t_s \leq 5$ s
-  \item Sobrevalor máximo: $M_p \leq 3\ $
+  \item Sobrevalor máximo: $M_p \leq 3 \%  $
 \end{itemize}
 
 %------------------------------------------------
@@ -284,7 +292,7 @@ Se diseñó un controlador PID en tiempo continuo empleando la herramienta SISOt
 % -----------------------------------------------------------------
 
 %------------------------------------------------
-\subsection{Controlador LQR con Acción Integral}
+\subsection{Controlador Realimentación de estados integrales (REI) por LQR}
 % -----------------------------------------------------------------
 % QUÉ ESCRIBIR AQUÍ:
 %   • Presentar el modelo en espacio de estados (A, B, C, D) usado.
@@ -405,7 +413,7 @@ Adicionalmente, se diseñó un controlador PID en tiempo discreto mediante SISOt
 %   NOTA: No interpretar causas aquí — eso corresponde a la Discusión.
 % -----------------------------------------------------------------
 
-En esta sección se presentan los resultados obtenidos en simulación e implementación física para cada controlador, evaluando el cumplimiento de las especificaciones de desempeño ($t_s \leq 5$ s, $M_p \leq 3\ $).
+En esta sección se presentan los resultados obtenidos en simulación e implementación física para cada controlador, evaluando el cumplimiento de las especificaciones de desempeño ($t_s \leq 5$ s, $M_p \leq 3 \% $).
 
 % -----------------------------------------------------------------
 % GRÁFICAS SUGERIDAS — para cada controlador (repetir bloque × 4):
