@@ -1,0 +1,127 @@
+\documentclass[mathserif,spanish]{beamer}
+
+\mode<presentation>{
+\usetheme{Warsaw}
+\setbeamertemplate{footline}[page number]
+}
+
+\usepackage{graphicx}
+\usepackage{booktabs} 
+\usefonttheme{professionalfonts}
+\usepackage[justification=centering]{caption}
+\usepackage{ragged2e}
+\justifying
+\usepackage[utf8]{inputenc} 
+\usepackage[spanish]{babel}
+
+\title[Lab 2]{Resultados del laboratorio 2}
+\subtitle{Grupo B}
+\author[E.Castro \and D.Chavarría \and E.Segura]{E.Castro \and D.Chavarría \and E.Segura}
+\institute[Instituto Tecnológico de Costa Rica]{
+Instituto Tecnológico de Costa Rica\\
+Escuela de Ingeniería Electrónica \\
+Laboratorio de Control Automático}
+\date{\today}
+
+\begin{document}
+
+
+\begin{frame}[plain]
+        \begin{center}
+            \includegraphics [height=3cm,width=6cm]{Figures/TEC.png}    % Imagen del TEC
+        \end{center}
+        \titlepage
+    \end{frame}
+
+
+\begin{frame}{Contenidos}
+\tableofcontents
+\end{frame}
+
+
+\section{Introducción}
+
+\begin{frame}{Resumen}
+\begin{itemize}
+\item Identificación experimental del sistema PADP.
+\item Modelo promedio a partir de datos válidos.
+\item Controladores: PID, ISF-LQR, I-PD y PID discreto.
+\item Validación en simulación y experimento.
+\item Especificaciones: $t_s \leq 5$ s, $M_p \leq 3\%$.
+\end{itemize}
+\end{frame}
+
+
+\section{Metodología}
+
+\begin{frame}{Identificación}
+\begin{itemize}
+\item 3 conjuntos de datos experimentales.
+\item Estimación de $\omega_n$ y $\zeta$.
+\item Uso de System Identification Toolbox.
+\item Modelo final promedio con aproximación del $87\%$.
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Controladores}
+\begin{itemize}
+\item PID continuo (SISOtool).
+\item ISF-LQR con acción integral.
+\item I-PD por ubicación de polos.
+\item PID discreto.
+\item Evaluación en simulación y experimento.
+\end{itemize}
+\end{frame}
+
+\section{Resultados}
+
+\begin{frame}{Resultados Experimentales del REI-LQR}
+\centering
+\includegraphics[width=0.8\linewidth]{Figures/experimental_rei.png}
+\end{frame}
+
+\begin{frame}{Resultados Simulación del REI-LQR}
+\centering
+\includegraphics[width=0.8\linewidth]{Figures/simulation_rei.png}
+\end{frame}
+
+\begin{frame}{Métricas del REI-LQR}
+\centering
+\begin{tabular}{lccc}
+\toprule
+Condición & $t_s$ & $M_p$ & Cumple \\
+\midrule
+Simulación & 9.94 s & 0.12\% & No \\
+Experimental & 3.98 s & 0\% & Sí \\
+\bottomrule
+\end{tabular}
+\end{frame}
+
+
+\section{Conclusiones}
+
+\begin{frame}{Conclusiones}
+El controlador REI-LQR logró error estacionario nulo, un $t_s$ de $3.98$ s y  un$M_p = 0\%$. 
+
+\end{frame}
+
+\begin{frame}{Recomendaciones}
+\begin{itemize}
+
+\end{itemize}
+\end{frame}
+
+
+\section{Bibliografía}
+
+\begin{frame}{Bibliografía}
+\footnotesize
+\begin{thebibliography}{9}
+\bibitem{ogata} Ogata, Modern Control Engineering.
+\bibitem{ljung} Ljung, System Identification.
+\bibitem{astrom} Åström, PID Control.
+\end{thebibliography}
+\end{thebibliography}
+\end{frame}
+
+\end{document}
