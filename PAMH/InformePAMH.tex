@@ -284,28 +284,55 @@ A continuous-time PID controller was designed using MATLAB's SISOtool with autom
 
 %------------------------------------------------
 \subsection{Integral State Feedback Controller (ISF) via LQR}
-% -----------------------------------------------------------------
-% WHAT TO WRITE HERE:
-%   • Present the state-space model (A, B, C, D) used.
-%   • Explain the system augmentation to include the integral state
-%     (augmented state-space).
-%   • Describe the selection of weighting matrices Q and R and
-%     the criterion used (e.g., Bryson's rule).
-%   • Show the resulting gain vector K and integral gain Ki.
-%   • Include simulated step response and ts / Mp metrics.
-% -----------------------------------------------------------------
-An integral state feedback controller was implemented using the LQR criterion. The system was augmented with an additional state that integrates the tracking error, ensuring zero steady-state error in response to step references.
+\label{sec:isf_lqr}
 
-% -----------------------------------------------------------------
-% SUGGESTED FIGURE — simulated step response (ISF-LQR):
-% \begin{figure}[H]
-%   \centering
-%   \includegraphics[width=0.45\textwidth]{lqr_sim.png}
-%   \caption{Step response of the system with ISF-LQR controller
-%            (simulation).}
-%   \label{fig:lqr_sim}
-% \end{figure}
-% -----------------------------------------------------------------
+An Integral State Feedback (ISF) controller was designed using the Linear Quadratic Regulator (LQR) criterion. The method augments the plant with an integral state to ensure zero steady-state error and improve disturbance rejection.
+
+The identified plant in controllable canonical form is:
+\begin{equation}
+  \mathbf{A} = \begin{bmatrix} -0.2481 & -15.4300 \\ 1 & 0 \end{bmatrix}, \quad
+  \mathbf{B} = \begin{bmatrix} 1 \\ 0 \end{bmatrix}, \quad
+  \mathbf{C} = \begin{bmatrix} 0 & 5.2870 \end{bmatrix}, \quad
+  \mathbf{D} = 0
+\end{equation}
+
+The system is fully controllable (rank $=2$). To include integral action, the augmented model is defined as:
+\begin{equation}
+  \dot{x}_I = r - \mathbf{C}\mathbf{x}
+\end{equation}
+\begin{equation}
+  \mathbf{A}_a =
+  \begin{bmatrix}
+  -0.2481 & -15.4300 & 0 \\
+  1 & 0 & 0 \\
+  0 & -5.2870 & 0
+  \end{bmatrix}, \quad
+  \mathbf{B}_a =
+  \begin{bmatrix}
+  1 \\ 0 \\ 0
+  \end{bmatrix}
+\end{equation}
+
+The augmented system is also controllable (rank $=3$). Based on the specifications ($t_s \leq 5$~s, $M_p \leq 3\,\%$), the desired poles were selected as:
+\begin{equation}
+  p_{1,2} = -2.8 \pm 3.1266j, \quad p_3 = -14.0
+\end{equation}
+
+The LQR weighting matrices were chosen using Bryson's rule:
+\begin{equation}
+  \mathbf{Q} = \operatorname{diag}\!\left(\frac{1}{9^2},\;\frac{1}{7^2},\;\frac{1}{0.45^2}\right), \quad
+  R = \frac{1}{0.6^2}
+\end{equation}
+
+The resulting gain vector $\hat{\mathbf{K}} = [k_1\;\;k_2\;\;K_i]$ is:
+\begin{equation}
+  \hat{\mathbf{K}} = \begin{bmatrix} 0.7214 & 0.4370 & -1.3333 \end{bmatrix}
+\end{equation}
+
+which yields the closed-loop poles:
+\begin{equation}
+  p_{1,2} = -0.2593 \pm 3.9454j, \quad p_3 = -0.4509
+\end{equation}
 
 %------------------------------------------------
 \subsection{I-PD Controller via Pole Placement}
@@ -405,42 +432,81 @@ A discrete-time PID controller was designed using SISOtool with a sampling perio
 %   NOTE: Do not interpret causes here — that belongs in Discussion.
 % -----------------------------------------------------------------
 
-This section presents the results obtained in both simulation and physical implementation for each controller, evaluating compliance with the performance specifications ($t_s \leq 5$ s, $M_p \leq 3\,\%$).
+This section presents the results obtained in both simulation and physical implementation for each controller, evaluating compliance with the performance specifications ($t_s \leq 5$~s, $M_p \leq 3\,\%$).
 
-% -----------------------------------------------------------------
-% SUGGESTED FIGURES — one pair per controller (repeat block × 4):
-%
+%------------------------------------------------
+\subsection{Continuous PID Controller}
+% Add simulation and experimental results here following the same structure as ISF-LQR below.
+
 % \begin{figure}[H]
 %   \centering
 %   \includegraphics[width=0.45\textwidth]{pid_cont_comp.png}
 %   \caption{Continuous PID — simulated vs.\ experimental step response.}
 %   \label{fig:pid_cont_comp}
 % \end{figure}
-%
-% \begin{figure}[H]
-%   \centering
-%   \includegraphics[width=0.45\textwidth]{lqr_comp.png}
-%   \caption{ISF-LQR — simulated vs.\ experimental step response.}
-%   \label{fig:lqr_comp}
-% \end{figure}
-%
+
+%------------------------------------------------
+\subsection{Integral State Feedback Controller via LQR}
+
+The closed-loop step responses of the ISF-LQR controller for $r = 0.6$~rad are shown in Fig.~1 (experiment) and Fig.~2 (simulation). The corresponding performance metrics are summarized in Table~\ref{tab:lqr_metrics}.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.45\textwidth]{Figures/experimental_rei.png}
+  \caption{Experimental step response of the ISF-LQR controller.}
+  \label{fig:lqr_exp}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.4\textwidth]{Figures/simulation_rei.png}
+  \caption{Simulated step response of the ISF-LQR controller.}
+  \label{fig:lqr_sim}
+\end{figure}
+
+\begin{table}[H]
+  \centering
+  \caption{ISF-LQR performance metrics: simulation vs.\ experiment}
+  \begin{tabular}{lcccc}
+    \toprule
+    Condition    & $t_s$ (s) & $M_p$ (\%) & $e_{ss}$ & Meets specs? \\
+    \midrule
+    Simulation   & 9.94 & 0.12 & 0 & \textbf{No} \\
+    Experimental & 3.98 & 0    & 0 & \textbf{Yes} \\
+    \bottomrule
+  \end{tabular}
+  \label{tab:lqr_metrics}
+\end{table}
+
+As observed, the simulated response exhibits a settling time of 9.94~s, exceeding the design requirement of 5~s, although the overshoot remains negligible at 0.12\,\%. In contrast, the experimental implementation achieves a significantly faster settling time of 3.98~s with no observable overshoot, fully complying with the specified performance criteria. Both cases satisfy the steady-state error requirement ($e_{ss} = 0$) due to the inclusion of integral action. Additionally, the overshoot constraint ($M_p \leq 3\,\%$) is met in both simulation and experimental results. 
+
+%------------------------------------------------
+\subsection{I-PD Controller via Pole Placement}
+% Add simulation and experimental results here.
+
 % \begin{figure}[H]
 %   \centering
 %   \includegraphics[width=0.45\textwidth]{ipd_comp.png}
 %   \caption{I-PD — simulated vs.\ experimental step response.}
 %   \label{fig:ipd_comp}
 % \end{figure}
-%
+
+%------------------------------------------------
+\subsection{Discrete PID Controller}
+% Add simulation and experimental results here.
+
 % \begin{figure}[H]
 %   \centering
 %   \includegraphics[width=0.45\textwidth]{pid_disc_comp.png}
 %   \caption{Discrete PID — simulated vs.\ experimental step response.}
 %   \label{fig:pid_disc_comp}
 % \end{figure}
-% -----------------------------------------------------------------
+
+%------------------------------------------------
+\subsection{Comparative Summary}
 
 % -----------------------------------------------------------------
-% SUGGESTED TABLE — simulated vs. experimental performance metrics:
+% SUGGESTED TABLE — overall simulated vs. experimental performance:
 %
 % \begin{table}[H]
 %   \centering
@@ -452,8 +518,8 @@ This section presents the results obtained in both simulation and physical imple
 %     Continuous PID  & Simulation   & ... & ... & ... & Yes/No \\
 %                     & Experimental & ... & ... & ... & Yes/No \\
 %     \midrule
-%     ISF-LQR         & Simulation   & ... & ... & ... & Yes/No \\
-%                     & Experimental & ... & ... & ... & Yes/No \\
+%     ISF-LQR         & Simulation   & 9.94 & 0.12 & 0 & No \\
+%                     & Experimental & 3.98 & 0    & 0 & Yes \\
 %     \midrule
 %     I-PD            & Simulation   & ... & ... & ... & Yes/No \\
 %                     & Experimental & ... & ... & ... & Yes/No \\
@@ -488,6 +554,24 @@ This section presents the results obtained in both simulation and physical imple
 % -----------------------------------------------------------------
 This section interprets the results presented above, analyzing the causes of the observed differences between theoretical models and the physical behavior of the system, as well as the advantages and disadvantages of each implemented control strategy.
 
+%------------------------------------------------
+\subsection{ISF-LQR: Simulation--Experiment Discrepancy}
+
+Figs.~\ref{fig:lqr_sim} and~\ref{fig:lqr_exp} show a clear contrast between simulated and experimental responses. The simulation exhibits a slowly damped transient with $t_s = 9.94$~s, consistent with the real pole $p_3 = -0.4509$ near the imaginary axis, which dominates the settling behavior despite the faster complex poles. In contrast, the experimental response converges monotonically to the 0.6~rad reference in $t_s = 3.98$~s with zero overshoot, satisfying both specifications.
+
+A small negative deflection at $t \approx 1$~s in the experimental response (about $-0.07$~rad) is attributed to actuator dead-zone and propeller inertia, which delay the onset of effective control action. This effect is not captured by the linear model.
+
+The faster experimental convergence is consistent with additional nonlinear damping (e.g., friction and aerodynamic drag), which increases the effective damping and suppresses oscillations, leading to a shorter settling time than predicted.
+
+Finally, the experimental response shows effective disturbance rejection; a perturbation at $t \approx 13$~s produces a deviation of approximately 0.25~rad, after which the output returns to the reference, remaining within the margin of less than $2\%$ steady-state error. This confirms the role of comprehensive action in rejecting disturbances despite the model's inaccuracies.
+
+% -----------------------------------------------------------------
+% Add discussion for remaining controllers below:
+%   • Continuous PID: comment on SISOtool tuning conservativeness
+%   • I-PD: pole placement vs. LQR trade-offs
+%   • Discrete PID: impact of sampling period, quantization effects
+% -----------------------------------------------------------------
+
 %================================================
 %  6. CONCLUSIONS
 %================================================
@@ -505,8 +589,7 @@ This section interprets the results presented above, analyzing the causes of the
 %   • Propose future work: nonlinear control, cascade control,
 %     active disturbance rejection, etc.
 % -----------------------------------------------------------------
-This work covered the complete identification and control cycle for a PADP system, from experimental data acquisition to the physical validation of four controllers. The process highlighted the importance of rigorous statistical analysis to ensure plant model quality, and enabled a comparative evaluation of control strategies with varying design complexity.
-
+The ISF-LQR controller achieved zero steady-state error and effective disturbance rejection. While the simulation resulted in $t_s = 9.94$~s and $M_p = 0.12\,\%$, failing the settling time requirement, the experimental response reached $t_s = 3.98$~s with $M_p = 0\,\%$, satisfying all specifications.
 %================================================
 %  REFERENCES
 %================================================
