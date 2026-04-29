@@ -137,8 +137,8 @@ Laboratorio de Control Automático}
 \toprule
 Condición & $t_s$ & $M_p$ & Cumple \\
 \midrule
-Simulación & - & - & - \\
-Experimental & - & - & - \\
+Simulación & 5.01 s & 3.04$\%$ & No \\
+Experimental & 5 s & 2.7$\%$ &  Sí \\
 \bottomrule
 \end{tabular}
 \end{frame}
@@ -202,8 +202,8 @@ Experimental & 3.98 s & 0\% & Sí \\
 \toprule
 Condición & $t_s$ & $M_p$ & Cumple \\
 \midrule
-Simulación & - & - & - \\
-Experimental & - & - & - \\
+Simulación & 3.9 s & 1.3 $\%$ & Sí \\
+Experimental & 4.94 s & 2.7$\%$ & Sí \\
 \bottomrule
 \end{tabular}
 \end{frame}
@@ -211,25 +211,37 @@ Experimental & - & - & - \\
 %------------------------------------------------
 \subsection{Discusión}
 
-\begin{frame}{Discusión}
-\begin{itemize}
-\item Comparación entre controladores.
-\item Evaluación del mejor desempeño.
-\item Diferencias entre simulación y experimento.
-\item Influencia del modelo de la planta.
-\end{itemize}
-\end{frame}
-
 \begin{frame}{Mejor controlador}
+
+\begin{columns}
+
+% Columna izquierda (texto)
+\column{0.45\textwidth}
 \begin{itemize}
 \item Selección basada en:
 \begin{itemize}
 \item Tiempo de establecimiento
 \item Sobreimpulso
 \item Error estacionario
+\item Mejor método
 \end{itemize}
-\item Justificación técnica del mejor método.
 \end{itemize}
+
+% Columna derecha (tabla)
+\column{0.55\textwidth}
+\centering
+\begin{tabular}{lccc}
+\toprule
+Controlador & $t_s$ & $M_p$ & $e_{ss}$ \\
+\midrule
+PID & 5 s & 2.7 $\%$ & 0.039 \\
+REI & 3.98 s & 0 $\%$ & 0 \\
+I-PD & 4.94 s & 2.7 $\%$ & 0 \\
+\bottomrule
+\end{tabular}
+
+\end{columns}
+
 \end{frame}
 
 %------------------------------------------------
