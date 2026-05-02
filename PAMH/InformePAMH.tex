@@ -4,6 +4,7 @@
 \usepackage{graphicx}
 \usepackage{float}
 \usepackage{booktabs}
+\usepackage{caption}
 
 %------------------------------------------------
 \begin{document}
@@ -250,11 +251,44 @@ Design specifications for all regulators: settling time $t_s \leq 5$~s (2\% crit
 %     ts and Mp metrics.
 %   • Indicate whether it meets the specifications.
 % -----------------------------------------------------------------
-A continuous-time PID controller was designed using MATLAB's SISOtool with automatic tuning, based on the identified plant model.
+A continuous-time PID controller was designed for the identified second-order plant model using the \textbf{Internal Model Control (IMC)} tuning methodology. Although the imposed speceficitation allows up to $3\%$ overshoot, the IMC tuning parameter was deliberately tightened until the simulated closed-loop response exhibited $\%OS \approx 0\%$. This conservative choice was motivated by the physical behaviour of the plant: the PAMH already introduces an inherent overshoot at the process level, so additional overshoot contributed by the feedback controller would accumulate, potentially violating the original specification in real operating conditions. By driving the controller-induced overshoot to zero, the closed-loop
+response remains within the $3\%$ bound even when the plant's natural overshoot is taken into
+account.
+
+The implemented controller incorporates a filtered derivative action to attenuate high-frequency noise
+amplification. Its transfer function is given by \ref{pid_continuous}
 
 \begin{equation}
-  C_{\text{PID}}(s) = K_p + \frac{K_i}{s} + K_d\,s
-  \label{eq:pid_continuous}
+PID(s) = K_p + \frac{K_i}{s} + K_d\, s \cdot \frac{N}{s + N}
+\label{eq:pid_continuous}
+\end{equation}
+
+\noindent where $K_p$ is the proportional gain, $K_i$ the integral gain, $K_d$ the derivative gain and $N$ the derivative filter coefficient.
+
+Once the IMC-equivalent open-loop transfer function $C(s)\,G(s)$ was obtained, its numerator and
+denominator polynomials were extracted in MATLAB.Identifying the coefficients
+of \eqref{eq:pid_continuous} with those polynomials, and setting $N$ equal to the second denominator coefficient.
+The tuning procedure yielded the following parameter values:
+
+\begin{table}[H]
+  \centering
+  \caption{IMC-tuned PID controller parameters.}
+  \label{tab:pid_params}
+  \begin{tabular}{cccc}
+    \hline
+    $K_p$ & $K_i$ & $K_d$ & $N$ \\
+    \hline
+    $-0.634$ & $2.000$ & $0.343$ & $3$ \\
+    \hline
+  \end{tabular}
+\end{table}
+
+\noindent The negative proportional gain is consistent with the sign convention of the identified plant, which exhibits an inherently inverting static gain.
+
+The PID controller with their values can be written as:
+\begin{equation}
+  C(s) \;=\; -0.634 \;+\; \frac{2}{s} \;+\; 0.343\,\frac{3s}{s + 3}
+  \label{eq:pid_values}
 \end{equation}
 
 % -----------------------------------------------------------------
@@ -276,10 +310,12 @@ An Integral State Feedback (ISF) controller was designed using the Linear Quadra
 
 The identified plant in controllable canonical form is:
 \begin{equation}
-  \mathbf{A} = \begin{bmatrix} -0.2481 & -15.4300 \\ 1 & 0 \end{bmatrix}, \quad
-  \mathbf{B} = \begin{bmatrix} 1 \\ 0 \end{bmatrix}, \quad
-  \mathbf{C} = \begin{bmatrix} 0 & 5.2870 \end{bmatrix}, \quad
-  \mathbf{D} = 0
+\begin{aligned}
+\mathbf{A} &= \begin{bmatrix} -0.2481 & -15.4300 \\ 1 & 0 \end{bmatrix}, 
+& \mathbf{B} &= \begin{bmatrix} 1 \\ 0 \end{bmatrix}, \\
+\mathbf{C} &= \begin{bmatrix} 0 & 5.2870 \end{bmatrix}, 
+& \mathbf{D} &= 0
+\end{aligned}
 \end{equation}
 
 The system is fully controllable (rank $=2$). To include integral action, the augmented model is defined as:
@@ -380,8 +416,31 @@ The third real pole p$_3$ was placed at five times the magnitude of the real par
 %     Kp, Ki, Kd parameters.
 %   • Briefly compare with the continuous PID.
 % -----------------------------------------------------------------
-A discrete-time PID controller was designed using SISOtool with a sampling period of $T = \ldots$ s, employing the \ldots\ discretization method.
+A discrete-time PID controller was designed through manual pole-zero placement in the
+$z$-domain, without resorting to an automated tuning method such as IMC. The compensator
+structure was chosen to consist of two real poles and two complex conjugate zeros, which
+corresponds to the discrete equivalent of a PID action with filtered derivative. The design
+procedure consisted of iteratively adjusting the controller gain, the natural frequency
+associated with the complex zero pair, and the pole locations until the closed-loop step
+response satisfied the specifications $T_s < 5\,\text{s}$ and $\%OS < 3\,\%$.
 
+The two poles were placed at $z = 1$, which introduces pure integral action and ensures zero
+steady-state error to a step reference, and at $z = 0.09$, which provides the derivative
+filtering role analogous to the $N$ parameter in the continuous design. The two complex zeros
+were positioned by tuning their associated natural frequency and damping ratio to shape the
+transient response, adding phase lead in the frequency band relevant to the settling
+requirement. The overall controller gain was then adjusted to achieve the desired closed-loop
+speed of response while keeping the overshoot within the imposed bound.
+
+The resulting discrete controller transfer function is:
+\begin{center}
+
+
+\begin{equation}
+  C(z) \;=\; \frac{3.0189\,(z^2 - 1.95z + 0.9881)}{(z - 0.09)(z - 1)},
+  \label{eq:pid_discrete}
+\end{equation}
+\end{center}
 % -----------------------------------------------------------------
 % SUGGESTED FIGURE — simulated step response (discrete PID):
 % \begin{figure}[H]
@@ -447,6 +506,64 @@ This section presents the results obtained in both simulation and physical imple
 %   \label{fig:pid_cont_comp}
 % \end{figure}
 
+The figure \ref{fig:pid_sim} shows the simulated closed-loop step response obtained by connecting the designed controller around the identified plant model.The output
+settles within the $\pm 2\%$ band with the response oscillating persistently around the
+reference once inside it. The sustained oscillation indicates that the simulation
+is operating at the boundary of the stability margin introduced by the IMC tuning.
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.45\textwidth]{Figures/simulation_PID.png}
+  \caption{Simulated step response of the PID controller.}
+  \label{fig:pid_sim}
+\end{figure}
+
+The experimental step response recorded on the physical platform. The out put enters and remains inside the  $\pm 2\%$ band with a small peak overshoot
+before settling cleanly, as summarised in Table~\ref{tab:PID_metrics}. A disturbance injected
+at $t = 20\,\text{s}$ causes a transient excursion, after which the controller successfully
+rejects it and returns the output to the reference, demonstrating integral action and robustness
+to step disturbances.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.45\textwidth]{Figures/experimental_pid.png}
+  \caption{Experimental step response of the PID controller.}
+  \label{fig:pid_exp}
+\end{figure}
+
+The primary difference between the two responses lies in the steady-state behaviour after
+settling. In simulation, the output exhibits a sustained low-amplitude oscillation that keeps
+it cycling inside the $\pm 2\%$ band, whereas experimentally the response damps out and
+converges to the reference without visible oscillation. Furthermore, the experimental response
+presents a visible peak overshoot before entering the band, a feature absent in the simulated
+response.
+
+To improve the experimental behaviour, the derivative filter coefficient was adjusted from
+$N = 3$ to $N = 5$ while keeping $K_p$, $K_i$, and $K_d$ unchanged. Increasing $N$ raises
+the filter cutoff frequency, allowing the derivative action to respond over a wider frequency
+range. This produces a stronger damping effect on the real platform, which explains both the
+suppression of the post-settling oscillation and the cleaner convergence observed experimentally.
+In simulation, the linear model does not capture the higher-frequency dynamics and sensor noise
+present on the physical system, so the lower value of $N$ was sufficient to meet the band
+criterion, albeit with residual oscillation. On the real platform, the increased derivative
+activity provided by $N = 5$ attenuates those higher-frequency components, resulting in a
+smoother and more stable steady-state response.
+
+\begin{table}[H]
+  \centering
+  \captionsetup{skip=4pt}
+  \renewcommand{\arraystretch}{0.95}
+  \caption{PID performance metrics: simulation vs.\ experiment}
+  \begin{tabular}{lcccc}
+    \toprule
+    Condition    & $t_s$ (s) & $M_p$ (\%) & $e_{ss}$ & Meets specs? \\
+    \midrule
+    Simulation   & 5.01 & 3.4 & 0 & \textbf{No} \\
+    Experimental & 5 & 2.7 & 0 & \textbf{Yes} \\
+    \bottomrule
+  \end{tabular}
+  \label{tab:PID_metrics}
+\end{table}
+
 %------------------------------------------------
 \subsection{Integral State Feedback Controller via LQR}
 
@@ -504,10 +621,22 @@ As observed, the simulated response exhibits a settling time of 9.94~s, exceedin
 %   \label{fig:pid_disc_comp}
 % \end{figure}
 
+Although the discrete PID controller \eqref{eq:pid_discrete} was designed through careful
+manual pole-zero placement, its experimental implementation on the physical plant did not
+yield a satisfactory closed-loop response. The controller failed to meet the imposed
+specifications under real operating conditions, exhibiting behaviour that deviated
+significantly from the expected performance. This outcome is attributed to the sensitivity
+of the manual tuning approach to unmodelled dynamics present in the physical system, which
+are not reflected in the linear model used during the design stage. 
+
+In light of these results, neither the simulation nor the experimental step response plots
+are included for this controller, as the experimental failure renders a comparative analysis
+inconclusive. The discrete PID design is documented here for completeness, to illustrate
+the limitations of manual frequency-domain tuning when unmodelled dynamics play a
+significant role in the closed-loop behaviour.
 %------------------------------------------------
 \subsection{Comparative Summary}
-
-% -----------------------------------------------------------------
+%-----------------------------------------------------------------
 % SUGGESTED TABLE — overall simulated vs. experimental performance:
 %
 % \begin{table}[H]
