@@ -51,13 +51,29 @@ This paper presents the experimental identification and closed-loop control of a
 %================================================
 \section{Introduction}
 
-The propeller-actuated damped pendulum (PADP) is an underactuated mechanical system whose angular position is governed by the aerodynamic torque of a brushless motor and propeller assembly, opposing gravity and bearing damping. Around a fixed operating point the nonlinear dynamics admit a linear second-order underdamped approximation \cite{ogata2010}, making it a compact yet representative platform for comparing identification and control strategies.
+The propeller-actuated damped pendulum (PADP) is an underactuated mechanical system whose
+angular position is governed by the aerodynamic torque of a brushless motor and propeller
+assembly. Around a fixed operating point, the nonlinear dynamics admit a linear second-order
+underdamped approximation \cite{ogata2010}, making it a representative platform for comparing
+control strategies under the design requirements of settling time $t_s \leq 5\,\text{s}$ and
+maximum overshoot $M_p \leq 3\,\%$.
 
-Accurate plant identification is the prerequisite for any model-based controller. Parametric methods extract the natural frequency $\omega_n$ and damping ratio $\zeta$ directly from measured transient features such as peak overshoot and oscillation period \cite{ljung1999}. Data-driven tools, such as MATLAB's \textit{ident} toolbox, complement this by fitting transfer function prototypes to minimize a prediction-error criterion. Because experimental data are always subject to noise and occasional disturbances, statistical screening across repeated trials is essential before any model averaging is performed.
+Plant identification was carried out using both parametric methods — extracting $\omega_n$ and
+$\zeta$ from measured transient features — and data-driven fitting via MATLAB's \textit{ident}
+toolbox \cite{ljung1999}. Statistical screening across repeated trials was applied to handle
+noise and disturbances before model averaging.
 
-Given a validated plant model, different control architectures offer distinct trade-offs. The PID with Internal Model Control (IMC) tuning \cite{astrom2006} is widely used for its simplicity, but its derivative action on the error signal can amplify noise and produce overshoot in oscillatory plants. The Linear Quadratic Regulator with an augmented integral state (ISF-LQR) provides a systematic, optimization-based synthesis that simultaneously penalizes control effort and tracking error, and guarantees zero steady-state offset \cite{anderson1990}. The I-PD structure — where only the integrator acts on the error while the proportional and derivative terms act exclusively on the plant output — eliminates derivative kick and typically reduces overshoot compared to the parallel PID \cite{visioli2006}; pole placement then allows the designer to prescribe closed-loop dynamics directly from the time-domain specifications.
+Three control architectures were implemented and compared. A continuous PID tuned via Internal
+Model Control (IMC) \cite{astrom2006}, a Linear Quadratic Regulator with augmented integral
+state (ISF-LQR) \cite{anderson1990}, and an I-PD controller with pole placement \cite{visioli2006},
+where the proportional and derivative terms act on the plant output to eliminate derivative kick
+and reduce overshoot.
 
-This paper reports the complete identification-to-validation cycle for the PADP. Section~\ref{sec:id} covers data acquisition, parameter estimation, statistical model selection, and the derivation of the final plant. Section~\ref{sec:ctrl} details the three controller designs. Sections~\ref{sec:results} and~\ref{sec:disc} present and interpret the experimental results against the design requirements of settling time $t_s \leq 5$~s and maximum overshoot $M_p \leq 3\,\%$.
+
+This paper reports the complete identification-to-validation cycle for the PADP. Section~\ref{sec:id}
+covers parameter estimation and plant derivation. Section~\ref{sec:ctrl} details the controller
+designs. Sections~\ref{sec:results} and~\ref{sec:disc} present and interpret the experimental
+results against the design specifications.
 
 %================================================
 %  2. SYSTEM IDENTIFICATION
@@ -222,22 +238,26 @@ Design specifications for all regulators: settling time $t_s \leq 5$~s (2\% crit
 %     ts and Mp metrics.
 %   • Indicate whether it meets the specifications.
 % -----------------------------------------------------------------
-A continuous-time PID controller was designed for the identified second-order plant model using the \textbf{Internal Model Control (IMC)} tuning methodology. Although the imposed speceficitation allows up to $3\%$ overshoot, the IMC tuning parameter was deliberately tightened until the simulated closed-loop response exhibited $\%OS \approx 0\%$. This conservative choice was motivated by the physical behaviour of the plant: the PAMH already introduces an inherent overshoot at the process level, so additional overshoot contributed by the feedback controller would accumulate, potentially violating the original specification in real operating conditions. By driving the controller-induced overshoot to zero, the closed-loop
-response remains within the $3\%$ bound even when the plant's natural overshoot is taken into
-account.
+A continuous-time PID controller was designed using the Internal Model Control (IMC) tuning
+methodology. The IMC parameter was deliberately tightened to achieve $\%OS \approx 0\%$ in
+simulation, since the plant already introduces an inherent overshoot that could accumulate and
+violate the $3\%$ bound in real operating conditions. The controller incorporates a filtered
+derivative action to attenuate high-frequency noise, as given by \eqref{eq:pid_continuous}.
 
-The implemented controller incorporates a filtered derivative action to attenuate high-frequency noise
-amplification. Its transfer function is given by \ref{pid_continuous}
 
 \begin{equation}
 PID(s) = K_p + \frac{K_i}{s} + K_d\, s \cdot \frac{N}{s + N}
 \label{eq:pid_continuous}
 \end{equation}
 
+<<<<<<< HEAD
 \noindent where $K_p$ is the proportional gain, $K_i$ the integral gain, $K_d$ the derivative gain and $N$ the derivative filter coefficient.
 
 Coefficient matching of the IMC-equivalent open-loop
 transfer function yielded:
+=======
+\noindent where $K_p$ is the proportional gain, $K_i$ the integral gain, $K_d$ the derivative gain and $N$ the derivative filter coefficient.The tuning procedure yielded the following parameter values:
+>>>>>>> Daniel
 
 \begin{table}[H]
   \centering
@@ -382,25 +402,18 @@ structure was chosen to consist of two real poles and two complex conjugate zero
 corresponds to the discrete equivalent of a PID action with filtered derivative. The design
 procedure consisted of iteratively adjusting the controller gain, the natural frequency
 associated with the complex zero pair, and the pole locations until the closed-loop step
-response satisfied the specifications $T_s < 5\,\text{s}$ and $\%OS < 3\,\%$.
-
-The two poles were placed at $z = 1$, which introduces pure integral action and ensures zero
-steady-state error to a step reference, and at $z = 0.09$, which provides the derivative
-filtering role analogous to the $N$ parameter in the continuous design. The two complex zeros
-were positioned by tuning their associated natural frequency and damping ratio to shape the
-transient response, adding phase lead in the frequency band relevant to the settling
-requirement. The overall controller gain was then adjusted to achieve the desired closed-loop
-speed of response while keeping the overshoot within the imposed bound.
+response satisfied the specifications.
 
 The resulting discrete controller transfer function is:
 \begin{center}
 
 
 \begin{equation}
-  C(z) \;=\; \frac{3.0189\,(z^2 - 1.95z + 0.9881)}{(z - 0.09)(z - 1)},
+  C(z) \;=\; \frac{3.0189\,(z^2 - 1.95z + 0.9881)}{(z - 0.09)(z - 1)}
   \label{eq:pid_discrete}
 \end{equation}
 \end{center}
+
 % -----------------------------------------------------------------
 % SUGGESTED FIGURE — simulated step response (discrete PID):
 % \begin{figure}[H]
@@ -453,7 +466,7 @@ The resulting discrete controller transfer function is:
 %   NOTE: Do not interpret causes here — that belongs in Discussion.
 % -----------------------------------------------------------------
 
-This section presents the results obtained in both simulation and physical implementation for each controller, evaluating compliance with the performance specifications ($t_s \leq 5$~s, $M_p \leq 3\,\%$).
+This section presents the results obtained in both simulation and physical implementation for each controller, evaluating compliance with the performance specifications.
 
 %------------------------------------------------
 \subsection{Continuous PID Controller}
@@ -502,9 +515,7 @@ $N = 3$ to $N = 5$ while keeping $K_p$, $K_i$, and $K_d$ unchanged. Increasing $
 the filter cutoff frequency, allowing the derivative action to respond over a wider frequency
 range. This produces a stronger damping effect on the real platform, which explains both the
 suppression of the post-settling oscillation and the cleaner convergence observed experimentally.
-In simulation, the linear model does not capture the higher-frequency dynamics and sensor noise
-present on the physical system, so the lower value of $N$ was sufficient to meet the band
-criterion, albeit with residual oscillation. On the real platform, the increased derivative
+On the real plant, the increased derivative
 activity provided by $N = 5$ attenuates those higher-frequency components, resulting in a
 smoother and more stable steady-state response.
 
@@ -617,19 +628,17 @@ Experimental & 4.94 & 2.7 & 0 & Yes \\
 %   \label{fig:pid_disc_comp}
 % \end{figure}
 
-Although the discrete PID controller \eqref{eq:pid_discrete} was designed through careful
-manual pole-zero placement, its experimental implementation on the physical plant did not
-yield a satisfactory closed-loop response. The controller failed to meet the imposed
-specifications under real operating conditions, exhibiting behaviour that deviated
-significantly from the expected performance. This outcome is attributed to the sensitivity
-of the manual tuning approach to unmodelled dynamics present in the physical system, which
-are not reflected in the linear model used during the design stage. 
-
-In light of these results, neither the simulation nor the experimental step response plots
-are included for this controller, as the experimental failure renders a comparative analysis
-inconclusive. The discrete PID design is documented here for completeness, to illustrate
-the limitations of manual frequency-domain tuning when unmodelled dynamics play a
-significant role in the closed-loop behaviour.
+The discrete PID controller \eqref{eq:pid_discrete}, designed via manual pole-zero placement,
+failed to meet the imposed specifications on the physical plant. Unlike the continuous IMC
+design, where the tuning parameter provides a structured and systematic path to
+satisfy the closed-loop requirements, the manual approach is inherently sensitive to unmodelled
+dynamics. In discrete time, this sensitivity is further amplified by quantisation effects
+introduced by the sampling process, discretisation approximation errors in the derivative
+action, and the reduced phase margin that results from the computational delay added by the
+digital implementation. These factors, absent in the continuous design, cause the discrete
+controller to behave differently on the real platform than predicted by the linear model.
+Due to the unsatisfactory experimental outcome, no simulation or experimental plots are
+included for this controller.
 %------------------------------------------------
 \subsection{Comparative Summary}
 %-----------------------------------------------------------------
