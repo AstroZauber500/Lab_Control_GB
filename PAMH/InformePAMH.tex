@@ -121,7 +121,8 @@ The PADP platform consists of an extruded-aluminium support rigidly fixed to a w
 %   • Conclude with the 3 TFs: G1_approx(s), G2_approx(s),
 %     G3_approx(s).
 % -----------------------------------------------------------------
-The logarithmic decrement method was applied to each trial to extract $\omega_n$, $\zeta$, and the static gain $K$ from the measured transient features (successive peak amplitudes and oscillation period):
+The logarithmic decrement method~\cite{ogata2010} was
+applied to each trial, yielding:
 
 \begin{equation}
   \delta = \frac{\ln(y_0/y_i)}{i}, \quad
@@ -164,8 +165,9 @@ yielding three second-order transfer functions of the prototype:
 %   • Comment qualitatively on agreement / disagreement with the
 %     approximation results above.
 % -----------------------------------------------------------------
-MATLAB's \textit{ident} toolbox was used in parallel to fit the same second-order prototype to each dataset via prediction-error minimization, producing three additional transfer functions with their respective best-fit percentages.
-
+MATLAB's \textit{ident} toolbox fitted the same prototype
+to each dataset, producing three additional models
+(Table~II).
 % -----------------------------------------------------------------
 % SUGGESTED TABLE — SYSID results (best-fit % + TF coefficients):
  \begin{table}[H]
@@ -207,47 +209,16 @@ MATLAB's \textit{ident} toolbox was used in parallel to fit the same second-orde
 %   • State that the final plant is the parameter-average of the
 %     remaining 4 TFs.
 % -----------------------------------------------------------------
-The six identified models were pooled and their parameters compared statistically. The mean $\bar{x}$ and sample standard deviation $s$ were computed for $K$, $\zeta$, and $\omega_n$. The two models derived from trial~3 showed parameter deviations exceeding $2s$ from the group mean, consistent with an external disturbance during that recording session. Those two models were therefore excluded, and the final plant was obtained by averaging the parameters of the four remaining transfer functions:
-
+The six models were pooled and their parameters
+compared statistically. Models from trial~3 deviated
+by more than $2s$ from the group mean, consistent
+with an external disturbance, and were excluded.
+The final plant was obtained by averaging the
+remaining four models:
 \begin{equation}
-  G(s) = \frac{K_{\text{avg}}\,\omega_{n,\text{avg}}^2}
-              {s^2 + 2\,\zeta_{\text{avg}}\,\omega_{n,\text{avg}}\,s + \omega_{n,\text{avg}}^2}
-  \label{eq:plant_final}
+G(s) = \frac{5.287}{s^2 + 0.2481s + 15.43}
+\label{eq:plant}
 \end{equation}
-
-% REPLACE with numerical values once computed:
- \begin{equation}
-   G(s) = \frac{5.287}{s^2 + 0.2481s + 15.43}
- \end{equation}
-
-% -----------------------------------------------------------------
-% SUGGESTED TABLE — statistical summary (6 TFs vs. 4 valid TFs):
-% \begin{table}[H]
-%   \centering
-%   \caption{Statistical summary of identified parameters}
-%   \begin{tabular}{lcccc}
-%     \toprule
-%     Param. & $\bar{x}$ (all 6) & $s$ (all 6) & $\bar{x}$ (4 valid) & $s$ (4 valid) \\
-%     \midrule
-%     $K$        & ... & ... & ... & ... \\
-%     $\zeta$    & ... & ... & ... & ... \\
-%     $\omega_n$ & ... & ... & ... & ... \\
-%     \bottomrule
-%   \end{tabular}
-%   \label{tab:stats}
-% \end{table}
-%
-% SUGGESTED FIGURE — 4 valid TF responses + averaged model vs.
-% experimental data from trials 1 and 2:
-% \begin{figure}[H]
-%   \centering
-%   \includegraphics[width=0.45\textwidth]{plant_final.png}
-%   \caption{Step responses of the four valid models, the averaged
-%            plant $G(s)$, and the experimental data from trials 1
-%            and 2.}
-%   \label{fig:plant}
-% \end{figure}
-% -----------------------------------------------------------------
 
 %================================================
 %  3. CONTROLLER DESIGN
@@ -279,7 +250,14 @@ PID(s) = K_p + \frac{K_i}{s} + K_d\, s \cdot \frac{N}{s + N}
 \label{eq:pid_continuous}
 \end{equation}
 
+<<<<<<< HEAD
+\noindent where $K_p$ is the proportional gain, $K_i$ the integral gain, $K_d$ the derivative gain and $N$ the derivative filter coefficient.
+
+Coefficient matching of the IMC-equivalent open-loop
+transfer function yielded:
+=======
 \noindent where $K_p$ is the proportional gain, $K_i$ the integral gain, $K_d$ the derivative gain and $N$ the derivative filter coefficient.The tuning procedure yielded the following parameter values:
+>>>>>>> Daniel
 
 \begin{table}[H]
   \centering
@@ -402,16 +380,7 @@ The third real pole p$_3$ was placed at five times the magnitude of the real par
  $$|p_3| = 5\,|\text{Re}(p_{1,2})| = 5 \times 1.3793 = 6.897$$
  This placement ensures that the transient contribution of p$_3$ decays approximately five times faster than the dominant pair
 
-% -----------------------------------------------------------------
-% SUGGESTED FIGURE — simulated step response (I-PD):
-% \begin{figure}[H]
-%   \centering
-%   \includegraphics[width=0.45\textwidth]{ipd_sim.png}
-%   \caption{Step response of the system with I-PD controller via
-%            pole placement (simulation).}
-%   \label{fig:ipd_sim}
-% \end{figure}
-% -----------------------------------------------------------------
+
 
 %------------------------------------------------
 \subsection{Discrete PID Controller (SISOtool)}
@@ -516,7 +485,7 @@ reference once inside it. The sustained oscillation indicates that the simulatio
 is operating at the boundary of the stability margin introduced by the IMC tuning.
 \begin{figure}[H]
   \centering
-  \includegraphics[width=0.45\textwidth]{Figures/simulation_PID.png}
+  \includegraphics[width=0.35\textwidth]{Figures/simulation_PID.png}
   \caption{Simulated step response of the PID controller.}
   \label{fig:pid_sim}
 \end{figure}
@@ -580,7 +549,7 @@ The closed-loop step responses of the ISF-LQR controller for $r = 0.6$~rad are s
 
 \begin{figure}[H]
   \centering
-  \includegraphics[width=0.4\textwidth]{Figures/simulation_rei.png}
+  \includegraphics[width=0.35\textwidth]{Figures/simulation_rei.png}
   \caption{Simulated step response of the ISF-LQR controller.}
   \label{fig:lqr_sim}
 \end{figure}
@@ -599,18 +568,54 @@ The closed-loop step responses of the ISF-LQR controller for $r = 0.6$~rad are s
   \label{tab:lqr_metrics}
 \end{table}
 
-As observed, the simulated response exhibits a settling time of 9.94~s, exceeding the design requirement of 5~s, although the overshoot remains negligible at 0.12\,\%. In contrast, the experimental implementation achieves a significantly faster settling time of 3.98~s with no observable overshoot, fully complying with the specified performance criteria. Both cases satisfy the steady-state error requirement ($e_{ss} = 0$) due to the inclusion of integral action. Additionally, the overshoot constraint ($M_p \leq 3\,\%$) is met in both simulation and experimental results. 
-
+Both conditions satisfy $e_{ss}=0$ and $M_p \leq 3\%$;
+the settling time discrepancy is addressed in
+Section~V.
 %------------------------------------------------
-\subsection{I-PD Controller via Pole Placement}
-% Add simulation and experimental results here.
 
-\begin{figure}[H]
-  \centering
-  \includegraphics[width=0.45\textwidth]{Figures/experimental_ipd.png}
-  \caption{Experimental step response of the ISF-LQR controller.}
-  \label{fig:lqr_exp}
-\end{figure}
+\subsection{I-PD Controller via Pole Placement}
+The closed-loop step responses for the I-PD controller
+are shown in Figs.~5 (experimental) and~6 (simulation).
+Performance metrics are summarized in Table~VI.
+
+% FIGURE 5 — experimental I-PD response
+ \begin{figure}[h]
+   \centering
+	   \includegraphics[width=0.45\textwidth]{Figures/experimental_ipd.png}
+   \caption{Experimental step response of the I-PD controller.}
+   \label{fig:ipd_exp}
+ \end{figure}
+
+ \begin{figure}[h]
+   \centering
+   \includegraphics[width=0.35\textwidth]{Figures/simulation_IPD.png}
+   \caption{Simulated step response of the I-PD controller.}
+   \label{fig:ipd_sim}
+ \end{figure}
+
+The simulated response exhibits near-critically-damped
+behaviour ($M_p = 1\%$, $t_s = 3.9$~s), consistent with
+the chosen pole locations ($\zeta_d \approx 0.946$). The
+actuator saturation included in simulation produces a
+mild oscillatory entry visible in both curves, caused by
+the motor saturating to zero when the pendulum exceeds
+the reference, a physically inevitable consequence of
+the unidirectional propeller thrust. Despite this, both
+responses remain within specifications.
+
+\begin{table}[h]
+\centering
+\caption{I-PD performance metrics: simulation vs. experiment}
+\begin{tabular}{lcccc}
+\toprule
+Condition & $t_s$ (s) & $M_p$ (\%) & $e_{ss}$ & Meets specs? \\
+\midrule
+Simulation   & 3.9 & 1.0 & 0 & Yes \\
+Experimental & 4.94 & 2.7 & 0 & Yes \\
+\bottomrule
+\end{tabular}
+\label{tab:ipd}
+\end{table}
 
 %------------------------------------------------
 \subsection{Discrete PID Controller}
