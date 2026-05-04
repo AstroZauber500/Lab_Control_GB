@@ -5,6 +5,7 @@
 \usepackage{float}
 \usepackage{booktabs}
 \usepackage{caption}
+\usepackage{multirow}
 
 %------------------------------------------------
 \begin{document}
@@ -43,7 +44,7 @@
 %   • Main result: ISF-LQR and I-PD met specs (ts ≤ 5 s, Mp ≤ 3 %);
 %     PID showed the weakest transient performance.
 % -----------------------------------------------------------------
-This paper presents the experimental identification and closed-loop control of a propeller-actuated damped pendulum (PADP). Three step-response datasets were collected and processed using both manual parameter approximation and MATLAB's System Identification toolbox, yielding six candidate transfer functions. Statistical analysis identified one experiment as disturbance-affected and excluded it; the final plant model was obtained by averaging the four remaining models. Three continuous-time controllers were designed — a PID tuned via IMC in SISOtool, an integral state feedback regulator via LQR (ISF-LQR), and an I-PD by pole placement — and physically validated against a settling time of 5~s and maximum overshoot of 3\%. The ISF-LQR and I-PD controllers satisfied both specifications, while the PID exhibited the poorest transient response among the three.
+This paper presents the experimental identification and closed-loop control of a propeller-actuated damped pendulum (PADP). Three step-response datasets were collected and processed using both manual parameter approximation and MATLAB's System Identification toolbox, yielding six candidate transfer functions. Statistical analysis identified one experiment as disturbance-affected and excluded it; the final plant model was obtained by averaging the four remaining models. Three continuous-time controllers were designed — a PID tuned via IMC in SISOtool, an integral state feedback regulator via LQR (ISF-LQR), and an I-PD by pole placement — and physically validated against a settling time of 5~s and maximum overshoot of 3\%. All three controllers satisfied both specifications experimentally; the ISF-LQR achieved the best transient performance ($t_s = 3.98$~s, $M_p = 0\%$), while the IMC-PID exhibited a pronounced control effort spike near steady state due to derivative action on the error signal.
 \end{abstract}
 
 %================================================
@@ -131,70 +132,37 @@ applied to each trial, yielding:
   \label{eq:approx}
 \end{equation}
 
-yielding three second-order transfer functions of the prototype:
+yielding three second-order transfer functions of the
+prototype (eq.~\ref{eq:tf_proto}). Table~\ref{tab:params}
+summarizes the parameters obtained by both methods.
+
 \begin{equation}
-  G_i(s) = K_i\frac{\omega_{n,i}^2}{s^2+2\zeta_i\omega_{n,i}s+\omega_{n,i}^2}, \quad i=1,2,3
+  G_i(s) = K_i\frac{\omega_{n,i}^2}{s^2+2\zeta_i
+  \omega_{n,i}s+\omega_{n,i}^2}, \quad i=1,2,3
   \label{eq:tf_proto}
 \end{equation}
 
-% -----------------------------------------------------------------
-% SUGGESTED TABLE — approximation results (3 trials):
- \begin{table}[H]
-   \centering
-   \caption{Parameters estimated by the logarithmic decrement method}
-   \begin{tabular}{cccc}
-     \toprule
-     Trial & $K$ & $\zeta$ & $\omega_n$ (rad/s) \\
-     \midrule
-     1 & 0.338 & 0.032 & 3.9292 \\
-     2 & 0.340 & 0.035 & 3.9294 \\
-     3 & 0.423 & 0.033 & 3.9291 \\
-     \bottomrule
-   \end{tabular}
-   \label{tab:approx}
- \end{table}
-% -----------------------------------------------------------------
+\begin{table}[h]
+  \centering
+  \caption{Identified parameters: approximation vs.\ SYSID}
+  \begin{tabular}{ccccc}
+    \toprule
+    Method & Trial & $K$ & $\zeta$ & $\omega_n$ (rad/s) \\
+    \midrule
+    \multirow{3}{*}{Approx.}
+      & 1 & 0.338 & 0.0320 & 3.9292 \\
+      & 2 & 0.340 & 0.0350 & 3.9294 \\
+      & 3 & 0.423 & 0.0330 & 3.9291 \\
+    \midrule
+    \multirow{3}{*}{SYSID}
+      & 1 & 0.346 & 0.0292 & 3.9225 \\
+      & 2 & 0.346 & 0.0295 & 3.9301 \\
+      & 3 & 0.426 & 0.0296 & 3.9091 \\
+    \bottomrule
+  \end{tabular}
+  \label{tab:params}
+\end{table}
 
-\subsection{MATLAB System Identification}
-% -----------------------------------------------------------------
-% WHAT TO WRITE HERE:
-%   • Briefly describe the ident workflow: import time-series data,
-%     select TF prototype of order 2 (underdamped poles), run
-%     prediction-error minimization, report best-fit (%) for each trial.
-%   • Present the three resulting TFs: G1_SI(s), G2_SI(s), G3_SI(s).
-%   • Comment qualitatively on agreement / disagreement with the
-%     approximation results above.
-% -----------------------------------------------------------------
-MATLAB's \textit{ident} toolbox fitted the same prototype
-to each dataset, producing three additional models
-(Table~II).
-% -----------------------------------------------------------------
-% SUGGESTED TABLE — SYSID results (best-fit % + TF coefficients):
- \begin{table}[H]
-   \centering
-   \caption{Parameters estimated by system identification}
-   \begin{tabular}{cccc}
-     \toprule
-     Trial & $K$ & $\zeta$ & $\omega_n$ (rad/s) \\
-     \midrule
-     1 & 0.346 & 0.0292 & 3.9225 \\
-     2 & 0.346 & 0.0295 & 3.9301 \\
-     3 & 0.426 & 0.0296 & 3.9091 \\
-     \bottomrule
-   \end{tabular}
-   \label{tab:approx}
- \end{table}
-
-% SUGGESTED FIGURE — measured vs. SYSID-simulated response (1 panel
-% per trial, or best-fit trial only to save space):
-% \begin{figure}[H]
-%   \centering
-%   \includegraphics[width=0.45\textwidth]{sysid_fit.png}
-%   \caption{MATLAB System Identification fit: experimental data vs.\
-%            simulated model response for each trial.}
-%   \label{fig:sysid}
-% \end{figure}
-% -----------------------------------------------------------------
 
 \subsection{Statistical Analysis and Model Selection}
 % -----------------------------------------------------------------
@@ -249,9 +217,6 @@ derivative action to attenuate high-frequency noise, as given by \eqref{eq:pid_c
 PID(s) = K_p + \frac{K_i}{s} + K_d\, s \cdot \frac{N}{s + N}
 \label{eq:pid_continuous}
 \end{equation}
-
-
-\noindent where $K_p$ is the proportional gain, $K_i$ the integral gain, $K_d$ the derivative gain and $N$ the derivative filter coefficient.
 
 Coefficient matching of the IMC-equivalent open-loop
 transfer function yielded:
@@ -359,26 +324,24 @@ which yields the closed-loop poles:
 %   • Decompose into P, I, D, N for PASCAL PID block implementation.
 %   • Show simulated step response; confirm specs.
 % -----------------------------------------------------------------
-The I-PD structure places the integrator on the error signal while the proportional and derivative terms act on the plant output, preventing derivative kick on step changes of the reference:
-
+The I-PD controller~\cite{visioli2006} prevents
+derivative kick by confining proportional and derivative
+action to the plant output, with only the integrator
+acting on the error:
 \begin{equation}
-  C_\text{I-PD}(s) = \frac{K_i}{s} - \left(K_p + K_d\,s\right)
-  \label{eq:ipd}
+  C_{\text{I-PD}}(s) = \frac{K_i}{s} - \left(K_p + K_d\,s\right)
 \end{equation}
-
-The target specifications ($t_s \leq 5$~s, $M_p \leq 3\,\%$) were mapped to the damping ratio $\zeta_d$ and natural frequency $\omega_{n,d}$ of the desired dominant poles. A third real pole was placed sufficiently far to the left to remain non-dominant. Coefficient matching of the closed-loop characteristic polynomial yielded $K_p$, $K_d$, and $K_i$, subsequently decomposed into P, I, D, N parameters for the PASCAL PID block. The controller was designed to specifications more strict than the nominal requirements ($t_s \leq 2.9$~s, $M_p \leq 1\,\%$) to provide a performance margin that compensates for the degradation expected during physical implementation.
-
-% FILL IN desired poles and resulting gains:
- \[
-   p_{1,2} =  -1.3793 \pm j0.4705 \quad p_3 = -6.8966
- \]
- \[
-   K_p = 1.0817,\quad K_i = 2.7704,\quad K_d = 1.7793,\quad N =  20
- \]
- 
-The third real pole p$_3$ was placed at five times the magnitude of the real part of the dominant poles, following the standard non-dominance criterion \cite{ogata2010}:
- $$|p_3| = 5\,|\text{Re}(p_{1,2})| = 5 \times 1.3793 = 6.897$$
- This placement ensures that the transient contribution of p$_3$ decays approximately five times faster than the dominant pair
+Dominant poles were derived from the specifications
+and a third real pole placed at $5\,|\text{Re}(p_{1,2})|$
+to satisfy the non-dominance criterion~\cite{ogata2010}.
+Stricter targets ($t_s \leq 2.9$~s, $M_p \leq 1\%$)
+were imposed to absorb implementation degradation:
+\[
+p_{1,2} = -1.3793 \pm j0.4705,\quad p_3 = -6.8966
+\]
+\[
+K_p = 1.0817,\; K_i = 2.7704,\; K_d = 1.7793,\; N = 20
+\]
 
 
 
@@ -479,22 +442,14 @@ This section presents the results obtained in both simulation and physical imple
 %   \label{fig:pid_cont_comp}
 % \end{figure}
 
-The figure \ref{fig:pid_sim} shows the simulated closed-loop step response obtained by connecting the designed controller around the identified plant model.The output
-settles within the $\pm 2\%$ band with the response oscillating persistently around the
-reference once inside it. The sustained oscillation indicates that the simulation
-is operating at the boundary of the stability margin introduced by the IMC tuning.
-\begin{figure}[H]
-  \centering
-  \includegraphics[width=0.35\textwidth]{Figures/simulation_PID.png}
-  \caption{Simulated step response of the PID controller.}
-  \label{fig:pid_sim}
-\end{figure}
+The simulated response settled at $t_s = 5.01$~s with $M_p = 3.4\%$, marginally outside specifications, consistent with the IMC tuning operating near the stability boundary. The experimental response is shown in Fig.~1; metrics for both conditions are summarized in Table~IV.
 
-The experimental step response recorded on the physical platform. The out put enters and remains inside the  $\pm 2\%$ band with a small peak overshoot
-before settling cleanly, as summarised in Table~\ref{tab:PID_metrics}. A disturbance injected
-at $t = 20\,\text{s}$ causes a transient excursion, after which the controller successfully
-rejects it and returns the output to the reference, demonstrating integral action and robustness
-to step disturbances.
+%\begin{figure}[H]
+%  \centering
+%  \includegraphics[width=0.35\textwidth]{Figures/simulation_PID.png}
+%  \caption{Simulated step response of the PID controller.}
+%  \label{fig:pid_sim}
+%\end{figure}
 
 \begin{figure}[H]
   \centering
@@ -503,21 +458,7 @@ to step disturbances.
   \label{fig:pid_exp}
 \end{figure}
 
-The primary difference between the two responses lies in the steady-state behaviour after
-settling. In simulation, the output exhibits a sustained low-amplitude oscillation that keeps
-it cycling inside the $\pm 2\%$ band, whereas experimentally the response damps out and
-converges to the reference without visible oscillation. Furthermore, the experimental response
-presents a visible peak overshoot before entering the band, a feature absent in the simulated
-response.
-
-To improve the experimental behaviour, the derivative filter coefficient was adjusted from
-$N = 3$ to $N = 5$ while keeping $K_p$, $K_i$, and $K_d$ unchanged. Increasing $N$ raises
-the filter cutoff frequency, allowing the derivative action to respond over a wider frequency
-range. This produces a stronger damping effect on the real platform, which explains both the
-suppression of the post-settling oscillation and the cleaner convergence observed experimentally.
-On the real plant, the increased derivative
-activity provided by $N = 5$ attenuates those higher-frequency components, resulting in a
-smoother and more stable steady-state response.
+The main simulation--experiment difference is the sustained oscillation inside the $\pm2\%$ band in simulation, absent experimentally due to unmodelled high-frequency dynamics. The derivative filter was adjusted to $N=5$ on the physical platform to attenuate these components, producing a smoother steady-state response than predicted by the linear model. 
 
 \begin{table}[H]
   \centering
@@ -538,7 +479,7 @@ smoother and more stable steady-state response.
 %------------------------------------------------
 \subsection{Integral State Feedback Controller via LQR}
 
-The closed-loop step responses of the ISF-LQR controller for $r = 0.6$~rad are shown in Fig.~1 (experiment) and Fig.~2 (simulation). The corresponding performance metrics are summarized in Table~\ref{tab:lqr_metrics}.
+The linear simulation predicted $t_s = 9.94$~s due to the non-dominant pole $p_3 = -0.4509$ near the imaginary axis. The experimental response is shown in Fig.~2; both conditions are compared in Table~V.
 
 \begin{figure}[H]
   \centering
@@ -547,12 +488,12 @@ The closed-loop step responses of the ISF-LQR controller for $r = 0.6$~rad are s
   \label{fig:lqr_exp}
 \end{figure}
 
-\begin{figure}[H]
-  \centering
-  \includegraphics[width=0.35\textwidth]{Figures/simulation_rei.png}
-  \caption{Simulated step response of the ISF-LQR controller.}
-  \label{fig:lqr_sim}
-\end{figure}
+%\begin{figure}[H]
+%  \centering
+%  \includegraphics[width=0.35\textwidth]{Figures/simulation_rei.png}
+%  \caption{Simulated step response of the ISF-LQR controller.}
+%  \label{fig:lqr_sim}
+%\end{figure}
 
 \begin{table}[H]
   \centering
@@ -574,9 +515,14 @@ Section~V.
 %------------------------------------------------
 
 \subsection{I-PD Controller via Pole Placement}
-The closed-loop step responses for the I-PD controller
-are shown in Figs.~5 (experimental) and~6 (simulation).
-Performance metrics are summarized in Table~VI.
+The simulation with actuator saturation yielded $t_s=3.9$~s
+and $M_p=1\%$, consistent with the conservative pole
+placement ($\zeta_d \approx 0.946$). The mild oscillatory
+entry visible in Fig.~3 is caused by the motor saturating
+to zero when the pendulum exceeds the reference — a
+physically inevitable consequence of unidirectional thrust,
+not a design deficiency. Both conditions meet specifications
+(Table~VI).
 
 % FIGURE 5 — experimental I-PD response
  \begin{figure}[h]
@@ -586,22 +532,13 @@ Performance metrics are summarized in Table~VI.
    \label{fig:ipd_exp}
  \end{figure}
 
- \begin{figure}[h]
-   \centering
-   \includegraphics[width=0.35\textwidth]{Figures/simulation_IPD.png}
-   \caption{Simulated step response of the I-PD controller.}
-   \label{fig:ipd_sim}
- \end{figure}
+% \begin{figure}[h]
+%   \centering
+%   \includegraphics[width=0.35\textwidth]{Figures/simulation_IPD.png}
+%   \caption{Simulated step response of the I-PD controller.}
+%   \label{fig:ipd_sim}
+% \end{figure}
 
-The simulated response exhibits near-critically-damped
-behaviour ($M_p = 1\%$, $t_s = 3.9$~s), consistent with
-the chosen pole locations ($\zeta_d \approx 0.946$). The
-actuator saturation included in simulation produces a
-mild oscillatory entry visible in both curves, caused by
-the motor saturating to zero when the pendulum exceeds
-the reference, a physically inevitable consequence of
-the unidirectional propeller thrust. Despite this, both
-responses remain within specifications.
 
 \begin{table}[h]
 \centering
@@ -641,32 +578,31 @@ Due to the unsatisfactory experimental outcome, no simulation or experimental pl
 included for this controller.
 %------------------------------------------------
 \subsection{Comparative Summary}
-%-----------------------------------------------------------------
-% SUGGESTED TABLE — overall simulated vs. experimental performance:
-%
-% \begin{table}[H]
-%   \centering
-%   \caption{Performance metrics comparison (simulation vs.\ experimental)}
-%   \begin{tabular}{llcccc}
-%     \toprule
-%     Controller      & Condition    & $t_s$ (s) & $M_p$ (\%) & $e_{ss}$ & Meets specs? \\
-%     \midrule
-%     Continuous PID  & Simulation   & ... & ... & ... & Yes/No \\
-%                     & Experimental & ... & ... & ... & Yes/No \\
-%     \midrule
-%     ISF-LQR         & Simulation   & 9.94 & 0.12 & 0 & No \\
-%                     & Experimental & 3.98 & 0    & 0 & Yes \\
-%     \midrule
-%     I-PD            & Simulation   & ... & ... & ... & Yes/No \\
-%                     & Experimental & ... & ... & ... & Yes/No \\
-%     \midrule
-%     Discrete PID    & Simulation   & ... & ... & ... & Yes/No \\
-%                     & Experimental & ... & ... & ... & Yes/No \\
-%     \bottomrule
-%   \end{tabular}
-%   \label{tab:comparison}
-% \end{table}
-% -----------------------------------------------------------------
+Table~VII consolidates the performance metrics of all
+three continuous-time controllers.
+\begin{table}[h]
+\centering
+\caption{Performance comparison: all controllers}
+\begin{tabular}{llcccc}
+\toprule
+Controller & Cond. & $t_s$ (s) & $M_p$ (\%) 
+           & $e_{ss}$ & Specs? \\
+\midrule
+\multirow{2}{*}{PID}
+  & Sim. & 5.01 & 3.4 & 0 & No  \\
+  & Exp. & 5.00 & 2.7 & 0 & Yes \\
+\midrule
+\multirow{2}{*}{ISF-LQR}
+  & Sim. & 9.94 & 0.12 & 0 & No  \\
+  & Exp. & 3.98 & 0    & 0 & Yes \\
+\midrule
+\multirow{2}{*}{I-PD}
+  & Sim. & 3.9  & 1.0  & 0 & Yes \\
+  & Exp. & 4.94 & 2.7  & 0 & Yes \\
+\bottomrule
+\end{tabular}
+\label{tab:comparison}
+\end{table}
 
 %================================================
 %  5. DISCUSSION
@@ -688,18 +624,36 @@ included for this controller.
 %   • Propose improvements: state observer, adaptive control,
 %     higher sensor resolution, etc.
 % -----------------------------------------------------------------
-This section interprets the results presented above, analyzing the causes of the observed differences between theoretical models and the physical behavior of the system, as well as the advantages and disadvantages of each implemented control strategy.
 
-%------------------------------------------------
 \subsection{ISF-LQR: Simulation--Experiment Discrepancy}
+Table~\ref{tab:lqr_metrics} shows a clear contrast between conditions. The slow simulated transient ($t_s = 9.94$~s) is dominated by the real pole $p_3 = -0.4509$ near the imaginary axis; experimentally, unmodelled nonlinear damping (friction, aerodynamic drag) suppresses this mode, yielding monotonic convergence at $t_s = 3.98$~s with zero overshoot. The initial negative deflection (${\approx}-0.07$~rad at $t \approx 1$~s) reflects actuator dead-zone and propeller inertia absent from the linear model. Disturbance rejection is confirmed at $t \approx 13$~s, where a $0.25$~rad excursion is fully recovered by the integral state, validating closed-loop robustness despite model inaccuracies.
 
-Figs.~\ref{fig:lqr_sim} and~\ref{fig:lqr_exp} show a clear contrast between simulated and experimental responses. The simulation exhibits a slowly damped transient with $t_s = 9.94$~s, consistent with the real pole $p_3 = -0.4509$ near the imaginary axis, which dominates the settling behavior despite the faster complex poles. In contrast, the experimental response converges monotonically to the 0.6~rad reference in $t_s = 3.98$~s with zero overshoot, satisfying both specifications.
+\subsection{Continuous PID via IMC}
+ Daniel\\
+ 
+ Daniel\\
+ 
+ Daniel\\
+ 
+ Daniel\\
+ 
+ Daniel\\
+ 
+ Daniel\\
+ 
+ Daniel\\
+ 
 
-A small negative deflection at $t \approx 1$~s in the experimental response (about $-0.07$~rad) is attributed to actuator dead-zone and propeller inertia, which delay the onset of effective control action. This effect is not captured by the linear model.
+\subsection{I-PD via Pole Placement}
+The I-PD controller achieved the most consistent agreement between simulation and experiment among the three designs. The conservative pole placement ($\zeta_d \approx 0.946$), corresponding to stricter targets of $t_s \leq 2.9$~s and $M_p \leq 1\%$, provided sufficient margin to absorb the degradation introduced by actuator saturation and ESC dead-band
+during physical implementation, yielding experimental metrics of $t_s = 4.94$~s and $M_p = 2.7\%$. 
 
-The faster experimental convergence is consistent with additional nonlinear damping (e.g., friction and aerodynamic drag), which increases the effective damping and suppresses oscillations, leading to a shorter settling time than predicted.
+The structural advantage of the I-PD over the IMC-PID is evident in the transient entry: by
+confining derivative and proportional action to the plant output, the reference step does not excite the
+derivative channel, avoiding the control effort spike that contributes to overshoot in the parallel PID structure. The oscillatory entry visible in the experimental response (Fig.~\ref{fig:ipd_exp}) is not a design deficiency but a direct consequence of the unidirectional propeller thrust saturating to zero when the pendulum exceeds the reference, a nonlinearity absent from the linear simulation. 
 
-Finally, the experimental response shows effective disturbance rejection; a perturbation at $t \approx 13$~s produces a deviation of approximately 0.25~rad, after which the output returns to the reference, remaining within the margin of less than $2\%$ steady-state error. This confirms the role of comprehensive action in rejecting disturbances despite the model's inaccuracies.
+Compared to the ISF-LQR, the I-PD offers a more transparent design path: pole placement provides a direct mapping from time-domain specifications to closed-loop pole locations, without requiring the selection of LQR weighting matrices $\mathbf{Q}$ and $R$, whose physical interpretation is less intuitive. However, the ISF-LQR benefits from explicitly using the velocity state to damp
+oscillations, which explains its faster experimental settling ($t_s = 3.98$~s vs.\ $4.94$~s) and zero overshoot even in the presence of nonlinear plant dynamics.
 
 % -----------------------------------------------------------------
 % Add discussion for remaining controllers below:
@@ -707,6 +661,8 @@ Finally, the experimental response shows effective disturbance rejection; a pert
 %   • I-PD: pole placement vs. LQR trade-offs
 %   • Discrete PID: impact of sampling period, quantization effects
 % -----------------------------------------------------------------
+
+
 
 %================================================
 %  6. CONCLUSIONS
@@ -725,7 +681,13 @@ Finally, the experimental response shows effective disturbance rejection; a pert
 %   • Propose future work: nonlinear control, cascade control,
 %     active disturbance rejection, etc.
 % -----------------------------------------------------------------
-The ISF-LQR controller achieved zero steady-state error and effective disturbance rejection. While the simulation resulted in $t_s = 9.94$~s and $M_p = 0.12\,\%$, failing the settling time requirement, the experimental response reached $t_s = 3.98$~s with $M_p = 0\,\%$, satisfying all specifications.
+This work completed the full identification-to-validation cycle for the PADP: experimental data acquisition, statistical model selection, controller design, and physical validation.
+
+All three continuous-time controllers satisfied the specifications of $t_s \leq 5$~s and $M_p \leq 3\%$ experimentally. However, the IMC-PID exhibited a pronounced control effort spike when driving the steady-state error to zero, a consequence of the derivative action on the error signal amplifying the plant's resonant response — its linear simulation additionally operated at the stability boundary, marginally failing both metrics. The ISF-LQR achieved the best experimental performance ($t_s = 3.98$~s, $M_p = 0\%$) through active velocity-state damping and integral disturbance rejection. The I-PD offered the most transparent design path, with pole placement providing a direct mapping from specifications to closed-loop dynamics and structural immunity to derivative kick, yielding ($t_s = 4.94$~s, $M_p = 2.7\%$).
+
+The consistent gap between simulation and experiment across all controllers reveals the primary challenge of this project: the averaged linear model does not capture
+the ESC dead-band, propeller thrust nonlinearity, and bearing friction present in the physical system. Future work should address this through nonlinear plant modeling, gain scheduling across the operating range, or an active disturbance rejection strategy to improve simulation fidelity and robustness beyond the linearization point.
+
 %================================================
 %  REFERENCES
 %================================================
