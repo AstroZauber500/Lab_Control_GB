@@ -371,7 +371,7 @@ The resulting discrete controller transfer function is:
 \begin{center}
 
 
-\begin{equation}
+\begin{equation} 
   C(z) \;=\; \frac{3.0189\,(z^2 - 1.95z + 0.9881)}{(z - 0.09)(z - 1)}
   \label{eq:pid_discrete}
 \end{equation}
@@ -629,20 +629,20 @@ Controller & Cond. & $t_s$ (s) & $M_p$ (\%)
 Table~\ref{tab:lqr_metrics} shows a clear contrast between conditions. The slow simulated transient ($t_s = 9.94$~s) is dominated by the real pole $p_3 = -0.4509$ near the imaginary axis; experimentally, unmodelled nonlinear damping (friction, aerodynamic drag) suppresses this mode, yielding monotonic convergence at $t_s = 3.98$~s with zero overshoot. The initial negative deflection (${\approx}-0.07$~rad at $t \approx 1$~s) reflects actuator dead-zone and propeller inertia absent from the linear model. Disturbance rejection is confirmed at $t \approx 13$~s, where a $0.25$~rad excursion is fully recovered by the integral state, validating closed-loop robustness despite model inaccuracies.
 
 \subsection{Continuous PID via IMC}
- Daniel\\
- 
- Daniel\\
- 
- Daniel\\
- 
- Daniel\\
- 
- Daniel\\
- 
- Daniel\\
- 
- Daniel\\
- 
+The IMC-PID controller met both specifications experimentally 
+($t_s = 5.00$~s, $M_p = 2.7\%$) despite the simulation marginally 
+violating them ($t_s = 5.01$~s, $M_p = 3.4\%$), as the IMC tuning 
+was deliberately placed near the stability boundary to compensate 
+for the plant's inherent overshoot. The principal limitation of 
+this design is structural: the derivative action operates on the 
+error signal, so the step reference excites the derivative channel 
+and produces a pronounced control effort spike near steady state, 
+amplifying the plant's lightly damped resonance ($\zeta \approx 0.029$). 
+To mitigate this, the derivative filter coefficient was reduced from 
+$N = 3$ to $N = 5$ on the physical platform, attenuating the 
+high-frequency content injected by quantisation and unmodelled 
+dynamics. 
+
 
 \subsection{I-PD via Pole Placement}
 The I-PD controller achieved the most consistent agreement between simulation and experiment among the three designs. The conservative pole placement ($\zeta_d \approx 0.946$), corresponding to stricter targets of $t_s \leq 2.9$~s and $M_p \leq 1\%$, provided sufficient margin to absorb the degradation introduced by actuator saturation and ESC dead-band
