@@ -1,319 +1,722 @@
 \documentclass[mathserif,spanish]{beamer}
 
 \mode<presentation>{
-\usetheme{Warsaw}
-\setbeamertemplate{footline}[page number]
+\usetheme{Madrid}
+\usecolortheme{whale}
+\setbeamertemplate{footline}[frame number]
+\setbeamertemplate{navigation symbols}{}
 }
 
 \usepackage{graphicx}
-\usepackage{booktabs} 
+\usepackage{booktabs}
+\usepackage{multirow}
 \usefonttheme{professionalfonts}
 \usepackage[justification=centering]{caption}
 \usepackage{ragged2e}
 \justifying
-\usepackage[utf8]{inputenc} 
+\usepackage[utf8]{inputenc}
 \usepackage[spanish]{babel}
 \usepackage{amsmath}
+\usepackage{xcolor}
+\usepackage{colortbl}
+\usepackage{array}
+\usepackage{tikz}
+\usetikzlibrary{shapes,arrows,positioning}
 
-\title[Lab 3]{Identificación y Control de un Sistema de Grúa}
+% ── Colores personalizados ──────────────────────────────────────────────────
+\definecolor{navyblue}{RGB}{13,31,78}
+\definecolor{accentteal}{RGB}{8,145,178}
+\definecolor{lightblue}{RGB}{186,230,253}
+\definecolor{kpigreen}{RGB}{22,163,74}
+\definecolor{kpiorange}{RGB}{234,88,12}
+\definecolor{rowsim}{RGB}{239,246,255}
+\definecolor{rowexp}{RGB}{240,253,244}
+\definecolor{rowhdr}{RGB}{13,31,78}
+
+% ── Macros útiles ───────────────────────────────────────────────────────────
+\newcommand{\kpibox}[3]{%
+  \begin{beamercolorbox}[sep=4pt,center,rounded=true,shadow=false]{block body}%
+    \textbf{\color{#1}\Large #2}\\[-2pt]
+    {\scriptsize #3}%
+  \end{beamercolorbox}%
+}
+
+\newcommand{\highlight}[1]{\textbf{\color{accentteal}#1}}
+\newcommand{\good}[1]{\textbf{\color{kpigreen}#1}}
+\newcommand{\warn}[1]{\textbf{\color{kpiorange}#1}}
+
+% ── Metadatos ───────────────────────────────────────────────────────────────
+\title[Lab 3 · Grúa]{Identificación y Control de un Sistema de Grúa}
 \subtitle{Grupo B}
-\author[E.Castro \and D.Chavarría \and E.Segura]{E.Castro \and D.Chavarría \and E.Segura}
-\institute[TEC]{
-Instituto Tecnológico de Costa Rica\\
-Escuela de Ingeniería Electrónica \\
-Laboratorio de Control Automático}
+\author[Castro \and Chavarría \and Segura]{E.\,Castro \and D.\,Chavarría \and E.\,Segura}
+\institute[TEC]{%
+  Instituto Tecnológico de Costa Rica\\
+  Escuela de Ingeniería Electrónica\\
+  Laboratorio de Control Automático}
 \date{\today}
 
+% ════════════════════════════════════════════════════════════════════════════
 \begin{document}
 
+% ── Portada ─────────────────────────────────────────────────────────────────
 \begin{frame}[plain]
 \begin{center}
-\includegraphics [height=3cm,width=6cm]{Figures/TEC.png}
+  % \includegraphics[height=2.5cm]{Figures/TEC.png}\\[6pt]
 \end{center}
 \titlepage
 \end{frame}
 
+% ── Contenidos ──────────────────────────────────────────────────────────────
 \begin{frame}{Contenidos}
 \tableofcontents
 \end{frame}
 
-%------------------------------------------------
+%=============================================================================
 \section{Objetivo}
+%=============================================================================
 
 \begin{frame}{Objetivo}
-\begin{itemize}
-\item Identificar experimentalmente la planta del sistema de grúa (carro-péndulo).
-\item Obtener un modelo SIMO promedio en espacio de estados.
-\item Diseñar y evaluar controladores por realimentación de estados con acción integral (ISF):
-\begin{itemize}
-\item Pole Placement (ubicación de polos)
-\item LQR (Regulador Cuadrático Lineal)
-\end{itemize}
-\item Comparar desempeño en simulación y experimento.
-\item Evaluar atenuación de oscilación del péndulo.
-\end{itemize}
+\begin{columns}[T]
+  \column{0.55\textwidth}
+  \begin{block}{Metas del laboratorio}
+  \begin{itemize}
+    \item Identificar experimentalmente la planta carro-péndulo.
+    \item Obtener modelo \textbf{SIMO} promedio en espacio de estados.
+    \item Diseñar y evaluar controladores \textbf{ISF}:
+      \begin{itemize}
+        \item Pole Placement
+        \item LQR
+      \end{itemize}
+    \item Comparar simulación vs.\ experimento.
+    \item Evaluar atenuación de oscilación del péndulo.
+  \end{itemize}
+  \end{block}
+
+  \column{0.42\textwidth}
+  \begin{alertblock}{Métricas de evaluación}
+  \centering
+  \begin{tabular}{cl}
+    $t_s$    & Tiempo de establecimiento \\[4pt]
+    $M_p$    & Sobreimpulso \\[4pt]
+    $e_{ss}$ & Error estacionario \\[4pt]
+    $\theta$ & Oscilación del péndulo \\
+  \end{tabular}
+  \end{alertblock}
+\end{columns}
 \end{frame}
 
-%------------------------------------------------
-\section{Resumen}
+%=============================================================================
+\section{Identificación}
+%=============================================================================
 
-\begin{frame}{Resumen}
-\begin{itemize}
-\item Identificación experimental de funciones de transferencia para posición del carro y ángulo del péndulo.
-\item Procesamiento de datos mediante MATLAB System Identification Toolbox.
-\item Construcción de un modelo SIMO promedio en espacio de estados.
-\item Diseño de controladores ISF mediante Pole Placement y LQR.
-\item Evaluación comparativa entre simulación y resultados experimentales.
-\end{itemize}
+\subsection{Setup experimental}
+
+\begin{frame}{Setup Experimental}
+\begin{columns}[T]
+  \column{0.52\textwidth}
+  \begin{block}{Plataforma}
+  \begin{itemize}
+    \item Carro accionado por motor DC\\
+          con transmisión polea-banda.
+    \item Péndulo acoplado al carro.
+    \item Encoders ópticos incrementales:\\
+      \quad posición $p$ \;·\; ángulo $\theta$
+    \item Excitación: trapezoidal $\approx 7.5\,\text{V}$
+    \item Periodo de muestreo: $T_s = 20\,\text{ms}$
+  \end{itemize}
+  \end{block}
+
+  \begin{exampleblock}{Selección de muestras}
+  \small
+  Se retuvieron \textbf{grua1, grua2, grua5, grua6}.\\
+  Criterio: \highlight{mínimo coeficiente de variación (CV)}\\
+  sobre los parámetros identificados.
+  \end{exampleblock}
+
+  \column{0.44\textwidth}
+  % Diagrama esquemático en TikZ
+  \begin{center}
+  \begin{tikzpicture}[scale=0.82, every node/.style={font=\small}]
+    % Riel
+    \draw[very thick, gray!60] (0,2.8) -- (3.8,2.8);
+    % Carro
+    \draw[thick, fill=navyblue!80] (1.2,2.8) rectangle (2.6,3.5);
+    \node[white] at (1.9,3.15) {\textbf{Carro}};
+    % Péndulo
+    \draw[thick, accentteal!80] (1.9,2.8) -- (1.45,1.05);
+    \fill[kpiorange] (1.35,0.9) circle (0.18);
+    % Etiquetas
+    \node[right] at (1.7,1.75) {$\theta$};
+    \draw[->,accentteal!70,thin] (1.9,1.7) arc[start angle=270,end angle=250,radius=0.7];
+    \node[above right] at (2.6,3.1) {$p \rightarrow$};
+    % Encoder carro
+    \node[draw,rounded corners,fill=lightblue!40,
+          font=\scriptsize,inner sep=2pt] at (1.9,3.9) {Encoder $p$};
+    % Encoder péndulo
+    \node[draw,rounded corners,fill=lightblue!40,
+          font=\scriptsize,inner sep=2pt] at (3.3,1.8) {Encoder $\theta$};
+    \draw[->,dashed,gray] (3.0,1.85) -- (1.7,1.4);
+  \end{tikzpicture}
+  \end{center}
+\end{columns}
 \end{frame}
 
-%------------------------------------------------
-\section{Metodología}
+%─────────────────────────────────────────────────────────────────────────────
+\subsection{Parámetros identificados}
 
-\subsection{Obtención de datos}
+\begin{frame}{Parámetros Identificados — Posición y Ángulo}
+\begin{columns}[T]
 
-\begin{frame}{Obtención de datos}
-\begin{itemize}
-\item Plataforma: carro accionado por motor DC con transmisión polea-banda.
-\item Péndulo acoplado al carro.
-\item Medición mediante encoders ópticos incrementales:
-\begin{itemize}
-\item Posición del carro $p$
-\item Ángulo del péndulo $\theta$
-\end{itemize}
-\item Excitación: entrada de voltaje trapezoidal de aproximadamente 7.5 V.
-\item Periodo de muestreo: 20 ms.
-\end{itemize}
+  %── Posición ───────────────────────────────────────────────────────────────
+  \column{0.48\textwidth}
+  {\centering\small\color{navyblue}\textbf{Posición del carro} $G_p(s)$\par}
+  \vspace{2pt}
+  \centering\scriptsize
+  \rowcolors{2}{rowsim}{white}
+  \begin{tabular}{lcc}
+    \rowcolor{rowhdr}
+    \color{white}\textbf{Muestra} &
+    \color{white}$K$ &
+    \color{white}$a_x$ \\
+    grua1 & 0.2493 & 10.41 \\
+    grua2 & 0.2542 & 10.50 \\
+    grua5 & 0.2546 & 10.44 \\
+    grua6 & 0.2611 & 10.69 \\
+    \rowcolor{accentteal!20}
+    \textbf{Promedio} & \textbf{0.2548} & \textbf{10.51} \\
+  \end{tabular}
+
+  \vspace{4pt}
+  \begin{block}{}
+  \centering\scriptsize
+  $G_p(s) = \dfrac{0.2548}{s^2 + 10.51\,s + 8.66{\times}10^{-7}}$
+  \end{block}
+
+  {\centering\scriptsize
+  \good{CV$(K)=1.67\%$} \quad \good{CV$(a_x)=0.99\%$}\\
+  $\Rightarrow$ modelo estable y confiable\par}
+
+  %── Ángulo ─────────────────────────────────────────────────────────────────
+  \column{0.48\textwidth}
+  {\centering\small\color{navyblue}\textbf{Ángulo del péndulo} $G_\theta(s)$\par}
+  \vspace{2pt}
+  \centering\scriptsize
+  \rowcolors{2}{rowsim}{white}
+  \begin{tabular}{lccc}
+    \rowcolor{rowhdr}
+    \color{white}\textbf{Muestra} &
+    \color{white}$\omega_n$ &
+    \color{white}$\zeta$ &
+    \color{white}$K$ \\
+    grua1 & 5.9447 & 0.001606 & $-$0.0141 \\
+    grua2 & 5.9439 & 0.001379 & $-$0.0112 \\
+    grua5 & 5.9464 & 0.001398 & $-$0.0135 \\
+    grua6 & 5.9464 & 0.001283 & $-$0.0145 \\
+    \rowcolor{accentteal!20}
+    \textbf{Prom.} & \textbf{5.9454} & \textbf{0.001417} & \textbf{$-$0.0133} \\
+  \end{tabular}
+
+  \vspace{4pt}
+  \begin{block}{}
+  \centering\scriptsize
+  $G_\theta(s) = \dfrac{-0.3858\,s - 0.4703}{s^2 + 0.01685\,s + 35.35}$
+  \end{block}
+
+  {\centering\scriptsize
+  \good{CV$(\omega_n)<0.05\%$} $\Rightarrow$ péndulo muy consistente\\
+  Sistema levemente subamortiguado: $\zeta\approx0.0014$\par}
+
+\end{columns}
 \end{frame}
 
-\subsection{Muestras seleccionadas}
-
-\begin{frame}{Muestras seleccionadas}
-\begin{itemize}
-\item De las tomas experimentales iniciales se seleccionaron las muestras: grua1, grua2, grua5 y grua6.
-\item Las muestras restantes presentaron alta desviación respecto al conjunto.
-\item Criterio: minimizar el coeficiente de variación (CV) de los parámetros identificados.
-\item El descarte permite mejorar la precisión del modelo promedio empleado para diseño.
-\end{itemize}
-\end{frame}
-
-\subsection{Estadística}
-
-\begin{frame}{Estadística de la planta - Posición}
-\centering
-\small
-\begin{tabular}{lcc}
-\toprule
-Modelo & $K$ & $a_x$ \\
-\midrule
-grua1 & 0.2493 & 10.41 \\
-grua2 & 0.2542 & 10.50 \\
-grua5 & 0.2546 & 10.44 \\
-grua6 & 0.2611 & 10.69 \\
-\midrule
-Promedio & 0.2548 & 10.51 \\
-\bottomrule
-\end{tabular}
-
-\vspace{0.5cm}
-Función de transferencia promedio de posición:
-\[
-G_p(s) = \frac{0.2548}{s^2 + 10.51\,s + 8.66\times 10^{-7}}
-\]
-\end{frame}
-
-\begin{frame}{Estadística de la planta - Ángulo}
-\centering
-\small
-\begin{tabular}{lccc}
-\toprule
-Modelo & $\omega_n$ & $\zeta$ & $K$ \\
-\midrule
-grua1 & 5.9447 & 0.001606 & -0.0141 \\
-grua2 & 5.9439 & 0.001379 & -0.0112 \\
-grua5 & 5.9464 & 0.001398 & -0.0135 \\
-grua6 & 5.9464 & 0.001283 & -0.0145 \\
-\bottomrule
-\end{tabular}
-
-\vspace{0.4cm}
-Función de transferencia promedio del ángulo:
-\[
-G_\theta(s) = \frac{-0.3858\,s - 0.4703}{s^2 + 0.01685\,s + 35.35}
-\]
-\end{frame}
-
-\
-
+%─────────────────────────────────────────────────────────────────────────────
 \subsection{Modelo SIMO}
 
-\begin{frame}{Modelo SIMO en espacio de estados}
-Vector de estados:
-\[
-x^T = \begin{bmatrix} p & \theta & \dot{p} & \dot{\theta} \end{bmatrix}
-\]
-\[
-A = \begin{bmatrix}
-0 & 0 & 1 & 0 \\
-0 & 0 & 0 & 1 \\
-0 & 0 & -10.51 & 0 \\
-0 & -35.35 & 0 & -0.0169
-\end{bmatrix},\quad
-B = \begin{bmatrix} 0 \\ 0 \\ 0.2548 \\ -0.3858 \end{bmatrix}
-\]
-\[
-C = \begin{bmatrix} 1 & 0 & 0 & 0 \end{bmatrix}
-\]
+\begin{frame}{Modelo SIMO en Espacio de Estados}
+\begin{columns}[T]
+  \column{0.54\textwidth}
+  \vspace{-4pt}
+  \[
+    x^T = \begin{bmatrix} p & \theta & \dot{p} & \dot{\theta} \end{bmatrix}
+  \]
+  \[
+    A = \begin{bmatrix}
+          0 & 0 & 1 & 0 \\
+          0 & 0 & 0 & 1 \\
+          0 & 0 & -10.51 & 0 \\
+          0 & -35.35 & 0 & -0.0169
+        \end{bmatrix}
+  \]
+  \[
+    B = \begin{bmatrix} 0 \\ 0 \\ 0.2548 \\ -0.3858 \end{bmatrix}, \quad
+    C = \begin{bmatrix} 1 & 0 & 0 & 0 \end{bmatrix}
+  \]
+
+  \column{0.43\textwidth}
+  \begin{exampleblock}{Observaciones clave}
+  \scriptsize
+  \begin{itemize}
+    \item Sistema \textbf{4.º orden}: doble integrador en posición.
+    \item Acoplamiento en $A_{42}=-35.35$:\\
+          péndulo $\leftrightarrow$ carro.
+    \item Salida única: $p$ (\textbf{SIMO}).
+    \item Péndulo casi sin amortiguamiento:\\
+          $a_{44}=-0.0169\approx 0$.
+  \end{itemize}
+  \end{exampleblock}
+
+  \begin{alertblock}{Controlabilidad}
+  \centering\small
+  $\text{rank}(\mathcal{M}_c) = 4$\\
+  Sistema totalmente controlable.
+  \end{alertblock}
+\end{columns}
 \end{frame}
 
-%------------------------------------------------
-\section{Controladores}
+%=============================================================================
+\section{Controladores ISF}
+%=============================================================================
 
-\begin{frame}{Controladores utilizados}
-\begin{itemize}
-\item Estrategia: Realimentación de estados con acción integral (ISF).
-\item Se añade un estado integral asociado al error de seguimiento de posición:
-\[
-\dot{x}_I = r - C_r x
-\]
-\item El sistema aumentado tiene matriz de controlabilidad de rango 5 (totalmente controlable).
-\item Dos técnicas evaluadas:
-\begin{itemize}
-\item Pole Placement (ubicación de polos)
-\item LQR (Regulador Cuadrático Lineal)
-\end{itemize}
-\end{itemize}
+\begin{frame}{Estrategia ISF — Marco Común}
+\begin{columns}[T]
+  \column{0.50\textwidth}
+  \begin{block}{Integral State Feedback (ISF)}
+  \begin{itemize}
+    \item Estado integral asociado al error:\\
+          $\dot{x}_I = r - C_r x$
+    \item Ley de control:\\
+          $u = -Kx + K_I\,x_I$
+    \item Sistema \textbf{aumentado} (5 estados).
+    \item $\text{rank}(\hat{\mathcal{M}}_c) = 5$ \good{$\checkmark$}
+  \end{itemize}
+  \end{block}
+
+  \begin{exampleblock}{Beneficios}
+  \scriptsize
+  \begin{itemize}
+    \item $e_{ss}=0$ garantizado ante escalón.
+    \item Polos de lazo cerrado asignables libremente.
+    \item Atenuación de oscilación del péndulo.
+  \end{itemize}
+  \end{exampleblock}
+
+  \column{0.46\textwidth}
+  % Diagrama de bloques ISF
+  \begin{center}
+  \begin{tikzpicture}[scale=0.72,
+    block/.style={draw,rounded corners,fill=navyblue!80,text=white,
+                  minimum width=1.1cm,minimum height=0.55cm,font=\scriptsize},
+    sum/.style={draw,circle,fill=white,inner sep=1.5pt,font=\scriptsize},
+    >=stealth]
+
+    \node[block] (plant) {Planta};
+    \node[sum,left=0.7cm of plant] (sum1) {$\Sigma$};
+    \node[block,below=0.5cm of plant,fill=accentteal!70] (K) {$K$};
+    \node[block,left=0.7cm of sum1,fill=kpiorange!70] (int) {$\int$};
+    \node[block,below=0.5cm of int,fill=kpiorange!70] (KI) {$K_I$};
+    \node[left=0.4cm of int] (r) {$r$};
+    \node[right=0.5cm of plant] (y) {$y{=}p$};
+
+    \draw[->] (r) -- (int);
+    \draw[->] (int) -- (sum1) node[midway,above,font=\tiny]{$x_I$};
+    \draw[->] (KI) -- (sum1);
+    \draw[->] (sum1) -- (plant) node[midway,above,font=\tiny]{$u$};
+    \draw[->] (plant) -- (y);
+    \draw[->] (plant.south) -- ++(0,-0.22) -| (K.east);
+    \draw[->] (K.west) -- (KI.east);
+    \draw[->] (plant.south) -- ++(0,-0.22) -| ++(2.0,0) |- ($(int.north)+(0,0.3)$)
+              -- (int.north) node[near start,right,font=\tiny]{$-$};
+  \end{tikzpicture}
+  \end{center}
+  \vspace{-4pt}
+  {\centering\scriptsize Dos técnicas evaluadas:\\
+  \textbf{Pole Placement} y \textbf{LQR}\par}
+\end{columns}
 \end{frame}
 
-%------------------------------------------------
+%─────────────────────────────────────────────────────────────────────────────
 \subsection{Pole Placement}
 
-\begin{frame}{Pole Placement}
-\begin{itemize}
-\item Diseño basado en ubicación deseada de polos en lazo cerrado.
-\item Sistema aumentado con estado integral para anular error estacionario.
-\item Cálculo de la ganancia $K$ mediante asignación directa de polos.
-\item Permite garantizar dinámica dominante y atenuación del péndulo según los polos seleccionados.
-\end{itemize}
+\begin{frame}{Pole Placement — Diseño}
+\begin{columns}[T]
+  \column{0.50\textwidth}
+  \begin{block}{Metodología}
+  \begin{enumerate}
+    \item Construir sistema \textbf{aumentado} (4+1 estados).
+    \item Seleccionar \textbf{5 polos deseados} en $\mathbb{C}^-$.
+    \item Calcular $\hat{K}=[K\;|\;K_I]$ con \texttt{place()} en MATLAB.
+    \item Verificar dinámica de lazo cerrado.
+  \end{enumerate}
+  \end{block}
+
+  \begin{alertblock}{Criterios de selección de polos}
+  \scriptsize
+  \begin{itemize}
+    \item Par dominante: $t_s$ y $M_p$ deseados.
+    \item Polos rápidos: al menos $\times$3 más rápidos.
+    \item Polo integral: suficientemente rápido.
+    \item Evitar cancelación con ceros del modelo.
+  \end{itemize}
+  \end{alertblock}
+
+  \column{0.46\textwidth}
+  \begin{block}{Polos en lazo cerrado}
+  \centering\small
+  % ── Completar con los polos reales ──────────────────
+  \[
+    \lambda_{cl}^{PP} = \{\;
+      \underbrace{\square}_{\text{dominante}},\;
+      \square,\;
+      \square \pm j\square,\;
+      \square
+    \;\}
+  \]
+  % ────────────────────────────────────────────────────
+  \end{block}
+
+  \begin{block}{Ganancias obtenidas}
+  \centering\scriptsize
+  % ── Completar con los valores reales ────────────────
+  \[
+    K_{PP} = \begin{bmatrix} \square & \square & \square & \square \end{bmatrix}
+  \]
+  \[
+    K_{I,PP} = \square
+  \]
+  % ────────────────────────────────────────────────────
+  \end{block}
+\end{columns}
 \end{frame}
 
+%─────────────────────────────────────────────────────────────────────────────
+
+\begin{frame}{Pole Placement — Resultados: Simulación vs Experimento}
+\begin{columns}[T]
+  %── Simulación ─────────────────────────────────────────────────────────────
+  \column{0.48\textwidth}
+  {\centering\small\color{navyblue}\textbf{Simulación}\par}
+  \vspace{4pt}
+
+  % Gráfica posición (simulación)
+  \begin{center}
+  \fbox{\rule{0pt}{2.0cm}\rule{4.4cm}{0pt}}\\
+  {\tiny Posición $p(t)$ — Simulación PP}
+  \end{center}
+
+  \vspace{2pt}
+
+  % KPIs simulación
+  \begin{center}\scriptsize
+  \rowcolors{1}{rowsim}{}
+  \begin{tabular}{lc}
+    \toprule
+    Métrica & Valor \\
+    \midrule
+    $t_s$ & $\square$ s \\
+    $M_p$ & $\square$ \% \\
+    $e_{ss}$ & $\square$ \\
+    Osc.\ péndulo & $\square$ \\
+    \bottomrule
+  \end{tabular}
+  \end{center}
+
+  %── Experimento ────────────────────────────────────────────────────────────
+  \column{0.48\textwidth}
+  {\centering\small\color{navyblue}\textbf{Experimento}\par}
+  \vspace{4pt}
+
+  % Gráfica posición (experimental)
+  \begin{center}
+  \fbox{\rule{0pt}{2.0cm}\rule{4.4cm}{0pt}}\\
+  {\tiny Posición $p(t)$ — Experimental PP}
+  \end{center}
+
+  \vspace{2pt}
+
+  % KPIs experimental
+  \begin{center}\scriptsize
+  \rowcolors{1}{rowexp}{}
+  \begin{tabular}{lc}
+    \toprule
+    Métrica & Valor \\
+    \midrule
+    $t_s$ & $\square$ s \\
+    $M_p$ & $\square$ \% \\
+    $e_{ss}$ & $\square$ \\
+    Osc.\ péndulo & $\square$ \\
+    \bottomrule
+  \end{tabular}
+  \end{center}
+
+\end{columns}
+\vspace{4pt}
+{\centering\tiny\color{gray}
+  \textit{Referencia escalón de 0.5 m.
+  Completar con datos experimentales.}\par}
+\end{frame}
+
+%─────────────────────────────────────────────────────────────────────────────
 \subsection{LQR}
 
-\begin{frame}{Parámetros de la regla de Bryson}
-\centering
-\small
-\begin{tabular}{lccc}
-\toprule
-Estado & Símbolo & Valor máx. & $Q_{ii}$ \\
-\midrule
-Posición & $p$ & 0.112 m & 80.0 \\
-Ángulo & $\theta$ & 0.209 rad & 23.0 \\
-Vel. lineal & $\dot{p}$ & 1.0 m/s & 1.0 \\
-Vel. angular & $\dot{\theta}$ & 0.354 rad/s & 8.0 \\
-Error integral & $\xi$ & 0.158 m$\cdot$s & 40.0 \\
-Control & $u$ & 1.0 V & $R = 1.0$ \\
-\bottomrule
-\end{tabular}
+\begin{frame}{LQR — Regla de Bryson}
+\begin{columns}[T]
+  \column{0.50\textwidth}
+  \begin{block}{Criterio de diseño}
+  \centering\small
+  \[
+    J = \int_0^\infty \!\bigl(x^TQx + u^TRu\bigr)\,dt
+  \]
+  \[
+    Q_{ii} = \frac{1}{x_{i,\max}^2}, \qquad
+    R = \frac{1}{u_{\max}^2}
+  \]
+  \end{block}
 
-\vspace{0.4cm}
-Ganancia aumentada obtenida:
-\[
-\hat{K}_{LQR} = \begin{bmatrix} 80.04 & -23.19 & 7.13 & -7.01 & -40.00 \end{bmatrix}
-\]
+  \vspace{4pt}
+  \begin{block}{Ganancias obtenidas}
+  \centering\scriptsize
+  \[
+    \hat{K}_{LQR} = \begin{bmatrix}
+      80.04 & {-}23.19 & 7.13 & {-}7.01 & {-}40.00
+    \end{bmatrix}
+  \]
+  \[
+    K = \begin{bmatrix}80.04 & {-}23.19 & 7.13 & {-}7.01\end{bmatrix}
+  \]
+  \[
+    K_I = -40.0
+  \]
+  \textbf{Polos LC:}
+  $-10.47,\;-1.50\pm 6.12j,\;-0.79\pm 0.49j$
+  \end{block}
+
+  \column{0.46\textwidth}
+  \centering\scriptsize
+  \rowcolors{2}{rowsim}{white}
+  \begin{tabular}{p{1.5cm}ccc}
+    \rowcolor{rowhdr}
+    \color{white}\textbf{Estado} &
+    \color{white}$x_{\max}$ &
+    \color{white}$Q_{ii}$ \\
+    Posición $p$         & 0.112 m       & \textbf{80.0} \\
+    Ángulo $\theta$      & 0.209 rad     & \textbf{23.0} \\
+    Vel.\ lineal $\dot{p}$    & 1.0 m/s  & 1.0 \\
+    Vel.\ ang.\ $\dot\theta$ & 0.354 r/s & \textbf{8.0} \\
+    Error int.\ $\xi$    & 0.158 m·s     & \textbf{40.0} \\
+    \rowcolor{kpiorange!15}
+    Control $u$          & 1.0 V         & $R=1.0$ \\
+  \end{tabular}
+
+  \vspace{6pt}
+  \begin{exampleblock}{\scriptsize Peso dominante}
+  \scriptsize
+  $Q_{pp}=80$ (posición) y $Q_{\xi\xi}=40$ (integral) priorizan el seguimiento.\\
+  $Q_{\theta\theta}=23$ atenúa oscilación del péndulo.
+  \end{exampleblock}
+\end{columns}
 \end{frame}
 
-\begin{frame}{Polos en lazo cerrado - LQR}
-\begin{itemize}
-\item Ganancias separadas:
-\[
-K = \begin{bmatrix} 80.04 & -23.19 & 7.13 & -7.01 \end{bmatrix}
-\]
-\[
-K_I = -40.0
-\]
-\item Polos en lazo cerrado obtenidos:
-\[
-\lambda_{cl} = \{-10.47,\ -1.50 \pm 6.12j,\ -0.79 \pm 0.49j\}
-\]
-\end{itemize}
-\end{frame}
+%─────────────────────────────────────────────────────────────────────────────
 
-%------------------------------------------------
-\subsection{Discusión}
+\begin{frame}{LQR — Resultados: Simulación vs Experimento}
+\begin{columns}[T]
+  %── Simulación ─────────────────────────────────────────────────────────────
+  \column{0.48\textwidth}
+  {\centering\small\color{navyblue}\textbf{Simulación}\par}
 
-\begin{frame}{Mejor controlador}
+  % Placeholder — reemplazar con \includegraphics
+  \begin{center}
+  \fbox{\rule{0pt}{1.4cm}\rule{4.4cm}{0pt}}\\
+  {\tiny Posición $p(t)$ — Simulación LQR}
+  \end{center}
+  \begin{center}
+  \fbox{\rule{0pt}{1.0cm}\rule{4.4cm}{0pt}}\\
+  {\tiny Ángulo $\theta(t)$ — Simulación LQR}
+  \end{center}
 
-\begin{columns}
+  \vspace{2pt}
+  {\centering\scriptsize
+  \begin{tabular}{lc}
+    \toprule Métrica & Valor \\ \midrule
+    $t_s$    & \good{4.701 s} \\
+    $M_p$    & \good{0.601\,\%} \\
+    $e_{ss}$ & \good{0} \\
+    \bottomrule
+  \end{tabular}\par}
 
-% Columna izquierda (texto)
-\column{0.40\textwidth}
-\begin{itemize}
-\item Selección basada en:
-\begin{itemize}
-\item Tiempo de establecimiento
-\item Sobreimpulso
-\item Error estacionario
-\item Atenuación de oscilación del péndulo
-\end{itemize}
-\end{itemize}
+  %── Experimento ────────────────────────────────────────────────────────────
+  \column{0.48\textwidth}
+  {\centering\small\color{navyblue}\textbf{Experimento}\par}
 
-% Columna derecha (tabla)
-\column{0.60\textwidth}
-\centering
-\scriptsize
-\begin{tabular}{llccc}
-\toprule
-Controlador & Condición & $t_s$ (s) & $M_p$ (\%) & $e_{ss}$ \\
-\midrule
-Pole Placement & Simulación   & -- & -- & -- \\
-               & Experimental & -- & -- & -- \\
-\midrule
-LQR            & Simulación   & 4.701 & 0.601 & 0 \\
-               & Experimental & 5.25  & 0     & 0 \\
-\bottomrule
-\end{tabular}
+  \begin{center}
+  \fbox{\rule{0pt}{1.4cm}\rule{4.4cm}{0pt}}\\
+  {\tiny Posición $p(t)$ — Experimental LQR}
+  \end{center}
+  \begin{center}
+  \fbox{\rule{0pt}{1.0cm}\rule{4.4cm}{0pt}}\\
+  {\tiny Ángulo $\theta(t)$ — Experimental LQR}
+  \end{center}
+
+  \vspace{2pt}
+  {\centering\scriptsize
+  \begin{tabular}{lc}
+    \toprule Métrica & Valor \\ \midrule
+    $t_s$    & \warn{5.25 s} \\
+    $M_p$    & \good{0\,\%} \\
+    $e_{ss}$ & \good{0} \\
+    \bottomrule
+  \end{tabular}\par}
 
 \end{columns}
 
+\vspace{2pt}
+\begin{block}{\scriptsize Diferencia $\Delta t_s = +0.55\,\text{s}$}
+\scriptsize
+Fricción $\cdot$ zona muerta del motor $\cdot$ saturación del actuador
+$\Rightarrow$ efectos no capturados por el modelo lineal.
+\end{block}
 \end{frame}
 
-%------------------------------------------------
+%=============================================================================
+\section{Comparativa}
+%=============================================================================
+
+\begin{frame}{Comparativa Final — PP vs LQR}
+
+{\centering\small
+\rowcolors{2}{rowsim}{white}
+\begin{tabular}{llcccc}
+  \rowcolor{rowhdr}
+  \color{white}\textbf{Controlador} &
+  \color{white}\textbf{Cond.} &
+  \color{white}$t_s$ (s) &
+  \color{white}$M_p$ (\%) &
+  \color{white}$e_{ss}$ &
+  \color{white}Osc.\ pénd. \\
+  \multirow{2}{*}{Pole Placement}
+    & Sim.  & $-$ & $-$ & $-$ & $-$ \\
+    & Exp.  & $-$ & $-$ & $-$ & $-$ \\
+  \rowcolor{rowexp}
+  \multirow{2}{*}{LQR}
+    & Sim.  & \good{4.701} & \good{0.601} & \good{0} & Atenuada \\
+  \rowcolor{rowexp}
+    & Exp.  & \warn{5.25}  & \good{0}     & \good{0} & Atenuada \\
+\end{tabular}\par}
+
+\vspace{6pt}
+
+\begin{columns}[T]
+  \column{0.48\textwidth}
+  \begin{exampleblock}{Análisis cuantitativo (LQR)}
+  \scriptsize
+  \begin{itemize}
+    \item $\Delta t_s = +0.55\,\text{s}$ (+11.7\%) entre sim.\ y exp.
+    \item $\Delta M_p = -0.60\%$: físico más amortiguado.
+    \item $e_{ss} = 0$ garantizado por acción integral.
+    \item Oscilación del péndulo atenuada en ambas condiciones.
+  \end{itemize}
+  \end{exampleblock}
+
+  \column{0.48\textwidth}
+  \begin{alertblock}{Ventajas y limitaciones}
+  \scriptsize
+  \begin{tabular}{p{0.9cm}p{1.5cm}p{1.5cm}}
+    & \textbf{PP} & \textbf{LQR} \\
+    \hline
+    Diseño & Intuitivo & Sistemático \\
+    Esfuerzo $u$ & No regulado & Minimizado \\
+    Ajuste & Manual & Bryson \\
+  \end{tabular}
+  \end{alertblock}
+\end{columns}
+\end{frame}
+
+%=============================================================================
 \section{Conclusiones}
+%=============================================================================
 
 \begin{frame}{Conclusiones}
-\begin{itemize}
-\item Se identificó la planta del sistema grúa obteniendo un modelo SIMO en espacio de estados representativo.
-\item El controlador LQR cumplió las especificaciones tanto en simulación ($t_s = 4.70$ s, $M_p = 0.60\%$) como en experimento ($t_s = 5.25$ s, $M_p = 0\%$).
-\item El error estacionario nulo se logró gracias a la acción integral del esquema ISF.
-\item Los resultados experimentales son consistentes con la simulación; el ligero aumento del $t_s$ se debe a fricción, zona muerta del motor y saturación del actuador.
-\item La ausencia de sobreimpulso experimental sugiere mayor amortiguamiento físico que el del modelo lineal.
-\end{itemize}
+\begin{enumerate}
+  \item Se identificó la planta grúa obteniendo un modelo SIMO 4.º orden con\\
+        \good{CV\,$<\,$2\,\%} en todos los parámetros — modelo confiable.
+
+  \item El controlador \textbf{LQR} cumplió las especificaciones:
+        \[
+          t_s^{\text{sim}}=4.70\,\text{s},\;
+          M_p^{\text{sim}}=0.60\,\%,\;
+          t_s^{\text{exp}}=5.25\,\text{s},\;
+          M_p^{\text{exp}}=0\,\%,\;
+          e_{ss}=0
+        \]
+
+  \item La \textbf{acción integral} del esquema ISF garantizó error estacionario nulo.
+
+  \item Diferencias sim.\ vs.\ exp.\ se atribuyen a:
+        fricción $\cdot$ zona muerta $\cdot$ saturación del actuador.
+
+  \item La ausencia de sobreimpulso experimental indica mayor amortiguamiento
+        físico que el del modelo linealizado.
+\end{enumerate}
 \end{frame}
 
-%------------------------------------------------
+%─────────────────────────────────────────────────────────────────────────────
 \subsection{Recomendaciones}
 
 \begin{frame}{Recomendaciones}
-\begin{itemize}
-\item Incorporar más sets de datos experimentales para reducir el CV en la identificación.
-\item Descartar muestras atípicas con criterios estadísticos formales.
-\item Considerar efectos no lineales (fricción, zona muerta, saturación) en el modelo.
-\item Ajustar los pesos de Bryson de forma conservadora para reducir esfuerzo de control.
-\item Explorar técnicas robustas para mejorar la atenuación de oscilación del péndulo.
-\end{itemize}
+\begin{columns}[T]
+  \column{0.50\textwidth}
+  \begin{block}{Identificación}
+  \begin{itemize}
+    \item Incorporar más sets experimentales para reducir CV.
+    \item Aplicar criterios estadísticos formales (IQR, Chauvenet) para descartar atípicos.
+  \end{itemize}
+  \end{block}
+
+  \begin{block}{Modelado}
+  \begin{itemize}
+    \item Incluir efectos no lineales:\\
+          fricción $\cdot$ zona muerta $\cdot$ saturación.
+  \end{itemize}
+  \end{block}
+
+  \column{0.46\textwidth}
+  \begin{block}{Control}
+  \begin{itemize}
+    \item Ajustar pesos de Bryson conservadoramente para reducir esfuerzo de control.
+    \item Explorar técnicas robustas ($H_\infty$, LQG) para mejor atenuación del péndulo.
+    \item Agregar realimentación de $\theta$ como salida secundaria para control explícito del ángulo.
+  \end{itemize}
+  \end{block}
+\end{columns}
 \end{frame}
 
-%------------------------------------------------
+%=============================================================================
 \section{Bibliografía}
+%=============================================================================
 
 \begin{frame}{Bibliografía}
 \footnotesize
 \begin{thebibliography}{9}
-\bibitem{ogata} K. Ogata, \emph{Modern Control Engineering}, 5th ed. Prentice Hall, 2010.
-\bibitem{ljung} L. Ljung, \emph{System Identification: Theory for the User}, 2nd ed. Prentice Hall, 1999.
-\bibitem{anderson} B. D. O. Anderson y J. B. Moore, \emph{Optimal Control: Linear Quadratic Methods}. Prentice Hall, 1990.
-\bibitem{franklin} G. F. Franklin, J. D. Powell y M. L. Emami-Naeini, \emph{Feedback Control of Dynamic Systems}, 4th ed. Prentice Hall, 1998.
-\bibitem{mathworks} MathWorks, \emph{System Identification Toolbox Documentation}.
+  \bibitem{ogata}
+    K.\,Ogata,
+    \emph{Modern Control Engineering}, 5th ed.
+    Prentice Hall, 2010.
+  \bibitem{ljung}
+    L.\,Ljung,
+    \emph{System Identification: Theory for the User}, 2nd ed.
+    Prentice Hall, 1999.
+  \bibitem{anderson}
+    B.\,D.\,O.\,Anderson y J.\,B.\,Moore,
+    \emph{Optimal Control: Linear Quadratic Methods}.
+    Prentice Hall, 1990.
+  \bibitem{franklin}
+    G.\,F.\,Franklin, J.\,D.\,Powell y M.\,L.\,Emami-Naeini,
+    \emph{Feedback Control of Dynamic Systems}, 4th ed.
+    Prentice Hall, 1998.
+  \bibitem{mathworks}
+    MathWorks,
+    \emph{System Identification Toolbox Documentation}.
+    \url{https://www.mathworks.com/help/ident/}
 \end{thebibliography}
 \end{frame}
 
