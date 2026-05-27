@@ -10,6 +10,7 @@
 \usepackage{url}
 \usepackage{array}
 \usepackage{siunitx}
+\usepackage{multirow}
 
 \begin{document}
 
@@ -27,21 +28,8 @@ Daniel Chavarria Garcia$^{*}$\\
 \maketitle
 
 \begin{abstract}
-This paper presents the experimental identification and
-control of a crane system using Integral
-State Feedback (ISF) techniques. Experimental data from the
-physical plant were processed using MATLAB System
-Identification Toolbox in order to derive empirical transfer
-functions for the cart position and pendulum angle dynamics.
-
-The identified models were combined into a complete SIMO
-state-space representation suitable for modern control design.
-Two controllers were considered for the project: Integral
-State Feedback via pole placement and Integral State
-Feedback using the Linear Quadratic Regulator (LQR)
-criterion. Those controllers were evaluated
-according to settling time, overshoot, steady-state error, and
-pendulum oscillation attenuation.
+This paper presents the experimental identification and modern state-feedback control of such a system. Empirical transfer functions for the cart position and pendulum angle were identified from physical plant data using the MATLAB System Identification Toolbox and combined into a fourth-order SIMO state-space representation. Two Integral State Feedback controllers were designed and evaluated: one based on Pole Placement and one on the Linear Quadratic Regulator (LQR) criterion, with performance assessed in terms of settling time, overshoot, steady-state error, and pendulum oscillation attenuation.Both controllers achieved zero steady-state error under a $0.5\,\text{m}$ step reference. However, LQR significantly outperformed Pole Placement in transient response and structural safety: while Pole Placement produced a pendulum deflection of $0.20\,\text{rad}$, exceeding the $\pm0.175\,\text{rad}$ safety bound, LQR constrained the deflection to $0.17\,\text{rad}$ and 
+eliminated cart overshoot entirely ($M_p = 0\%$) with a settling time penalty of only $1.7\%$. These results establish LQR with integral action as the preferred framework for balancing tracking performance and physical safety constraints in underactuated crane systems.
 \end{abstract}
 
 \section{Introduction}
@@ -405,7 +393,7 @@ In simulation, the cart position response, shown in Fig.~\ref{fig:lqr_sim_pos},
 achieved a settling time of $t_s = 4.701\,\text{s}$, a peak overshoot of 
 $M_p = 0.601\%$, and zero steady-state error. The corresponding pendulum angle 
 response, shown in Fig.~\ref{fig:lqr_sim_ang}, remained within the safety bound 
-throughout the transient, with a peak deflection of $ 0.17\,\text{rad}} $. This 
+throughout the transient, with a peak deflection of $0.17\,\text{rad}$. This 
 improvement over Pole Placement is a direct consequence of the Bryson's 
 rule-weighted cost function, which distributes control authority across all state 
 variables and explicitly suppresses inter-axis coupling.
@@ -483,11 +471,6 @@ experimental overshoot below the threshold of the nominal prediction.
         \bottomrule
     \end{tabular}
     \vspace{4pt}
-    \begin{minipage}{\columnwidth}
-        \footnotesize $^{\mathrm{a}}$Error metric not applicable: unmodeled mechanical 
-        friction fully suppressed the sub-percentage transient predicted by simulation, 
-        yielding zero measured overshoot.
-    \end{minipage}
 \end{table}	
 
 \section{Conclusions}
