@@ -14,12 +14,12 @@
 \usepackage{caption}
 \usepackage{subcaption}
 \usefonttheme{professionalfonts}
-\usepackage[justification=centering]{caption}
 \usepackage{ragged2e}
 \justifying
 \usepackage[utf8]{inputenc}
 \usepackage[spanish]{babel}
 \usepackage{amsmath}
+\usepackage{mathtools} % Añadido para mejorar las ecuaciones con \split y \underbrace
 \usepackage{xcolor}
 \usepackage{colortbl}
 \usepackage{array}
@@ -314,10 +314,7 @@
   \column{0.46\textwidth}
   % Diagrama de bloques ISF
   \begin{center}
-	\begin{figure}
-	\centering
-	\includegraphics[scale=0.2]{Figures/planta.png}
-	\end{figure}
+	\includegraphics[width=\textwidth]{Figures/planta.png}
   \end{center}
   \vspace{-4pt}
   {\centering\scriptsize Dos técnicas evaluadas:\\
@@ -350,37 +347,32 @@
     \end{itemize}
   \end{block}
 
-  \column{0.46 \textwidth}
+  \column{0.46\textwidth}
   \begin{block}{Polos en lazo cerrado}
-  \centering\small
-  % ── Completar con los polos reales ──────────────────
-\textsc{\[
-\begin{split}
-  \lambda_{cl}^{PP} = \{ & \underbrace{-1.08 \pm j0.97}_{\text{dominante}}, \\ 
-                         & -4.32, \; -5.40, \; -6.4865 \}
-\end{split}
-\]}
-
-  % ────────────────────────────────────────────────────
+    \centering\small
+    \[
+    \begin{split}
+      \lambda_{cl}^{PP} = \{ & \underbrace{-1.08 \pm j0.97}_{\text{dominante}}, \\ 
+                             & -4.32, \; -5.40, \; -6.4865 \}
+    \end{split}
+    \]
   \end{block}
 
   \begin{block}{Ganancias obtenidas}
-  \centering\scriptsize
-  % ── Completar con los valores reales ────────────────
-\[
-  K_{PP} = \begin{bmatrix} 56.61 & -17.84 & 2.28 & -0.82 \end{bmatrix}
-\]
-\[
-  K_{I,PP} = 35.47
-\]
-  % ────────────────────────────────────────────────────
+    \centering\scriptsize
+    \[
+      K_{PP} = \begin{bmatrix} 56.61 & -17.84 & 2.28 & -0.82 \end{bmatrix}
+    \]
+    \[
+      K_{I,PP} = 35.47
+    \]
   \end{block}
 \end{columns}
 \end{frame}
 
 %─────────────────────────────────────────────────────────────────────────────
 
-\begin{frame}{Pole Placement — Simulación vs.\ Experimento}
+\begin{frame}{Pole Placement — Posición del carro: Simulación vs.\ Experimento}
 \begin{columns}[T]
 
   \column{0.48\textwidth}
@@ -388,25 +380,21 @@
   \vspace{4pt}
   \begin{figure}
     \centering
-    \fbox{\rule{0pt}{2.2cm}\rule{4.2cm}{0pt}}
-    \caption{Posición $p(t)$ — Simulación PP.}
-    \label{fig:pp_sim}
+    \includegraphics[width=0.95\linewidth]{Figures/grafica_carrito_pole_S.png}
+    \caption{Respuesta de simulación de posición usando PP.}
+    \label{fig:pp_pos_sim}
   \end{figure}
   \vspace{-4pt}
   \begin{table}
     \centering
-    \caption{KPIs — Simulación PP.}
-    \label{tab:kpi_pp_sim}
+    \caption{Métricas de posición de la simulación con PP.}
+    \label{tab:kpi_pp_pos_sim}
     \scriptsize
-    \rowcolors{1}{rowsim}{}
     \begin{tabular}{lc}
-      \toprule
-      Métrica & Valor \\
-      \midrule
-      $t_s$ (s)      & $\square$ \\
-      $M_p$ (\%)     & $\square$ \\
-      $e_{ss}$        & $\square$ \\
-      Osc.\ péndulo  & $\square$ \\
+      \toprule Métrica & Valor \\ \midrule
+      $t_s$ (s)  & 4.4995 \\
+      $M_p$ (\%) & 2.4194 \\
+      $e_{ss}$   & 0 \\
       \bottomrule
     \end{tabular}
   \end{table}
@@ -416,34 +404,80 @@
   \vspace{4pt}
   \begin{figure}
     \centering
-    \fbox{\rule{0pt}{2.2cm}\rule{4.2cm}{0pt}}
-    \caption{Posición $p(t)$ — Experimental PP.}
-    \label{fig:pp_exp}
+    \includegraphics[width=0.95\linewidth]{Figures/grafica_carrito_polos.png}
+    \caption{Respuesta experimental de posición usando PP.}
+    \label{fig:pp_pos_exp}
   \end{figure}
   \vspace{-4pt}
   \begin{table}
     \centering
-    \caption{KPIs — Experimental PP.}
-    \label{tab:kpi_pp_exp}
+    \caption{Métricas de posición del experimento con PP.}
+    \label{tab:kpi_pp_pos_exp}
     \scriptsize
-    \rowcolors{1}{rowexp}{}
     \begin{tabular}{lc}
-      \toprule
-      Métrica & Valor \\
-      \midrule
-      $t_s$ (s)      & $\square$ \\
-      $M_p$ (\%)     & $\square$ \\
-      $e_{ss}$        & $\square$ \\
-      Osc.\ péndulo  & $\square$ \\
+      \toprule Métrica & Valor \\ \midrule
+      $t_s$ (s)  & $5.16$ \\
+      $M_p$ (\%) & $3.6$ \\
+      $e_{ss}$   & 0 \\
       \bottomrule
     \end{tabular}
   \end{table}
 
 \end{columns}
-\vspace{2pt}
-{\centering\tiny\color{gray}\textit{Referencia: escalón de 0.5\,m. Completar con datos experimentales.}\par}
 \end{frame}
 
+%─────────────────────────────────────────────────────────────────────────────
+\begin{frame}{Pole Placement — Ángulo del péndulo: Simulación vs.\ Experimento}
+\begin{columns}[T]
+
+  \column{0.48\textwidth}
+  {\centering\small\color{navyblue}\textbf{Simulación}\par}
+  \vspace{4pt}
+  \begin{figure}
+    \centering
+    \includegraphics[width=0.95\linewidth]{Figures/grafica_carrito_angle_S.png}
+    \caption{Respuesta de simulación de ángulo usando PP.}
+    \label{fig:pp_angle_sim}
+  \end{figure}
+  \vspace{-4pt}
+  \begin{table}
+    \centering
+    \caption{Métricas de ángulo de la simulación con PP.}
+    \label{tab:kpi_pp_angle_sim}
+    \scriptsize
+    \begin{tabular}{lc}
+      \toprule Métrica & Valor \\ \midrule
+      $e_{ss}$ (rad)      & 0 \\
+      Undershoot (rad)    & $-$0.26 \\
+      \bottomrule
+    \end{tabular}
+  \end{table}
+
+  \column{0.48\textwidth}
+  {\centering\small\color{navyblue}\textbf{Experimento}\par}
+  \vspace{4pt}
+  \begin{figure}
+    \centering
+    \includegraphics[width=0.95\linewidth]{Figures/grafica_angulo_polos.png}
+    \caption{Respuesta experimental de ángulo usando PP.}
+    \label{fig:pp_angle_exp}
+  \end{figure}
+  \vspace{-4pt}
+  \begin{table}
+    \centering
+    \caption{Métricas de ángulo del experimento con PP.}
+    \label{tab:kpi_pp_angle_exp}
+    \scriptsize
+    \begin{tabular}{lc}
+      \toprule Métrica & Valor \\ \midrule
+      $e_{ss}$ (rad)      & 0.20 \\
+      Undershoot (rad)    & $-$0.152 \\
+      \bottomrule
+    \end{tabular}
+  \end{table}
+
+\end{columns}
+\end{frame}
 %─────────────────────────────────────────────────────────────────────────────
 \subsection{LQR}
 
@@ -499,7 +533,7 @@
 
 %─────────────────────────────────────────────────────────────────────────────
 
-\begin{frame}{LQR — Posicón del carro: Simulación vs.\ Experimento}
+\begin{frame}{LQR — Posición del carro: Simulación vs.\ Experimento}
 \begin{columns}[T]
 
   \column{0.48\textwidth}
@@ -611,7 +645,7 @@
 
 \begin{frame}{Comparativa Final — PP vs.\ LQR}
 
-  \begin{table}
+\begin{table}
     \centering
     \caption{Resumen de métricas de desempeño para ambos controladores.}
     \label{tab:comparativa}
@@ -626,19 +660,16 @@
       \color{white}$e_{ss}$ &
       \color{white}Osc.\ pénd. \\
       \hline
-
-      & Sim. & $-$ & $-$ & $-$ & $-$ \\
-      \sidebyside{\multirow{-2}{*}{Pole Placement}}
-      & Exp. & $-$ & $-$ & $-$ & $-$ \\
+      \multirow{2}{*}{Pole Placement} & Sim. & 4.4995 & 2.4194 & 0 & Atenuada \\
+                                      & Exp. & 5.16   & 3.6    & 0 & Atenuada \\
       \hline
       \rowcolor{rowsim}
-      & Sim. & 4.701 & 0.601 & 0 & Atenuada \\
+                                      & Sim. & 4.701  & 0.601  & 0 & Atenuada \\
       \rowcolor{rowsim}
-      \sidebyside{\multirow{-2}{*}{LQR}}
-      & Exp. & 5.25  & 0     & 0 & Atenuada \\
+      \multirow{-2}{*}{LQR}           & Exp. & 5.25   & 0      & 0 & Atenuada \\
       \hline
     \end{tabular}
-\end{table}
+  \end{table}
 
   \vspace{4pt}
   \begin{columns}[T]
@@ -654,7 +685,7 @@
     \end{block}
 
     \column{0.48\textwidth}
-    \begin{block}{Ventajas y limitaciones}
+    \begin{block}{Ventajas y limitations}
       \scriptsize
       \centering
       \vspace{4pt}
