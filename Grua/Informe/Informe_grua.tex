@@ -11,6 +11,8 @@
 \usepackage{array}
 \usepackage{siunitx}
 \usepackage{multirow}
+\usepackage{placeins}
+
 
 \begin{document}
 
@@ -353,7 +355,7 @@ bounding intermediate state trajectories.
 
 \begin{figure}[htbp]
     \centering
-    \includegraphics[width=0.85\linewidth]{Figuras/grafica_carrito_polos_sim.png}
+    \includegraphics[width=0.7\linewidth]{Figuras/grafica_carrito_polos_sim.png}
     \caption{Simulated closed-loop step response for cart position and pendulum 
     angle under Pole Placement control.}
     \label{fig:pp_simulation_curves}
@@ -370,21 +372,22 @@ latency of the $20\,\text{ms}$ sampling interval. These discrepancies motivate
 the adoption of an optimal control strategy capable of explicitly trading off 
 tracking speed against parametric uncertainty and state constraints.
 
-\begin{figure}[htbp]
+\begin{figure}[H]
     \centering
-    \includegraphics[width=0.8\linewidth]{Figuras/grafica_carrito_polos.png}
+    \includegraphics[width=0.7\linewidth]{Figuras/grafica_carrito_polos.png}
     \caption{Experimental step response of the cart position under Pole Placement 
     control.}
     \label{fig:pp_exp_cart}
 \end{figure}
 
-\begin{figure}[htbp]
+\begin{figure}[H]
     \centering
-    \includegraphics[width=0.8\linewidth]{Figuras/grafica_angulo_polos.png}
+    \includegraphics[width=0.7\linewidth]{Figuras/grafica_angulo_polos.png}
     \caption{Experimental pendulum deflection angle during the position step 
     displacement under Pole Placement control.}
     \label{fig:pp_exp_angle}
 \end{figure}
+
 
 \subsection{LQR Controller}
 
@@ -398,17 +401,17 @@ improvement over Pole Placement is a direct consequence of the Bryson's
 rule-weighted cost function, which distributes control authority across all state 
 variables and explicitly suppresses inter-axis coupling.
 
-\begin{figure}[htbp]
+\begin{figure}[H]
     \centering
-    \includegraphics[width=\columnwidth]{Figuras/grafica_carrito_s.png}
+    \includegraphics[width=0.7\linewidth]{Figuras/grafica_carrito_s.png}
     \caption{Simulated cart position $p(t)$ under LQR control for a 
     $0.5\,\text{m}$ step reference.}
     \label{fig:lqr_sim_pos}
 \end{figure}
 
-\begin{figure}[htbp]
+\begin{figure}[H]
     \centering
-    \includegraphics[width=\columnwidth]{Figuras/grafica_angle_s.png}
+    \includegraphics[width=0.7\linewidth]{Figuras/grafica_angle_s.png}
     \caption{Simulated pendulum angle $\theta(t)$ under LQR control for a 
     $0.5\,\text{m}$ step reference.}
     \label{fig:lqr_sim_ang}
@@ -423,17 +426,17 @@ the nominal model predicts indicates that the physical mechanical dissipation
 exceeds the damping captured by the linearized plant, which in this case 
 acted beneficially by further attenuating the residual transient.
 
-\begin{figure}[htbp]
+\begin{figure}[H]
     \centering
-    \includegraphics[width=\columnwidth]{Figuras/grafica_carrito.png}
+    \includegraphics[width=0.7\linewidth]{Figuras/grafica_carrito.png}
     \caption{Experimental cart position $p(t)$ under LQR control for a 
     $0.5\,\text{m}$ step reference.}
     \label{fig:lqr_exp_pos}
 \end{figure}
 
-\begin{figure}[htbp]
+\begin{figure}[H]
     \centering
-    \includegraphics[width=\columnwidth]{Figuras/grafica_angulo.png}
+    \includegraphics[width=0.7\linewidth]{Figuras/grafica_angulo.png}
     \caption{Experimental pendulum angle $\theta(t)$ under LQR control for a 
     $0.5\,\text{m}$ step reference.}
     \label{fig:lqr_exp_ang}
@@ -451,7 +454,7 @@ under Pole Placement ($48.79\%$) confirms its higher sensitivity to unmodeled
 plant dynamics, whereas LQR demonstrated superior robustness by driving the 
 experimental overshoot below the threshold of the nominal prediction.
 
-\begin{table}[htbp]
+\begin{table}[H]
     \centering
     \caption{Quantitative Controller Comparison and Model Validation}
     \label{tab:comp}
