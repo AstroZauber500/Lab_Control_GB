@@ -17,6 +17,9 @@
 \justifying
 \usepackage[utf8]{inputenc}
 \usepackage[spanish]{babel}
+\makeatletter
+\AtBeginDocument{\def\%{\@percentchar}}
+\makeatother
 \usepackage{amsmath}
 \usepackage{mathtools}
 \usepackage{xcolor}
@@ -417,8 +420,7 @@
   {\centering\small\color{navyblue}\textbf{Experimento (Self-Checker)}\par}
   \vspace{4pt}
   \begin{center}
-    \fbox{\parbox{0.88\linewidth}{\centering\vspace{1.8cm}
-    {\scriptsize [Figura: Respuesta pitch PP experimental]}\vspace{1.8cm}}}
+    \includegraphics[width=0.95\linewidth,height=3.6cm,keepaspectratio]{PP_Pitch.png}
   \end{center}
   \vspace{-4pt}
   \begin{table}
@@ -447,8 +449,7 @@
   {\centering\small\color{navyblue}\textbf{Restricción Yaw}\par}
   \vspace{4pt}
   \begin{center}
-    \fbox{\parbox{0.88\linewidth}{\centering\vspace{1.8cm}
-    {\scriptsize [Figura: Señal Yaw PP experimental]}\vspace{1.8cm}}}
+    \includegraphics[width=0.95\linewidth,height=3.6cm,keepaspectratio]{PP_Yaw.png}
   \end{center}
   \vspace{-4pt}
   \begin{table}
@@ -471,8 +472,7 @@
   {\centering\small\color{navyblue}\textbf{Rechazo de Perturbación}\par}
   \vspace{4pt}
   \begin{center}
-    \fbox{\parbox{0.88\linewidth}{\centering\vspace{1.8cm}
-    {\scriptsize [Figura: Perturbación PP experimental]}\vspace{1.8cm}}}
+    \includegraphics[width=0.95\linewidth,height=3.6cm,keepaspectratio]{PP_Pert_Yaw.png}
   \end{center}
   \vspace{-4pt}
   \begin{table}
@@ -585,8 +585,7 @@
   {\centering\small\color{navyblue}\textbf{Experimento (Self-Checker: 92/100)}\par}
   \vspace{4pt}
   \begin{center}
-    \fbox{\parbox{0.88\linewidth}{\centering\vspace{1.8cm}
-    {\scriptsize [Figura: Respuesta pitch LQR experimental]}\vspace{1.8cm}}}
+    \includegraphics[width=0.95\linewidth,height=3.6cm,keepaspectratio]{LQR_Pitch.png}
   \end{center}
   \vspace{-4pt}
   \begin{table}
@@ -615,8 +614,7 @@
   {\centering\small\color{navyblue}\textbf{Restricción Yaw}\par}
   \vspace{4pt}
   \begin{center}
-    \fbox{\parbox{0.88\linewidth}{\centering\vspace{1.8cm}
-    {\scriptsize [Figura: Señal Yaw LQR experimental]}\vspace{1.8cm}}}
+    \includegraphics[width=0.95\linewidth,height=3.6cm,keepaspectratio]{LQR_Yaw.png}
   \end{center}
   \vspace{-4pt}
   \begin{table}
@@ -639,8 +637,7 @@
   {\centering\small\color{navyblue}\textbf{Rechazo de Perturbación}\par}
   \vspace{4pt}
   \begin{center}
-    \fbox{\parbox{0.88\linewidth}{\centering\vspace{1.8cm}
-    {\scriptsize [Figura: Perturbación LQR experimental]}\vspace{1.8cm}}}
+    \includegraphics[width=0.95\linewidth,height=3.6cm,keepaspectratio]{LQR_Pert_Yaw.png}
   \end{center}
   \vspace{-4pt}
   \begin{table}
@@ -661,7 +658,6 @@
 
 \end{columns}
 \end{frame}
-
 %=============================================================================
 \section{Comparativa}
 %=============================================================================
