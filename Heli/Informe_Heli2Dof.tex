@@ -145,7 +145,7 @@ The cost function $J = \int_0^\infty (\mathbf{x}_e^T \mathbf{Q} \mathbf{x}_e + \
 \label{sec:experimental}
 % ============================================================
 
-Both controllers were implemented on the Heli2DoF platform with $T_s = 20\,\text{ms}$. Aggregate metrics are summarized in Table~\ref{tab:comp}; Figs.~\ref{fig:pitch}--\ref{fig:pert} show the time responses for pitch tracking, yaw constraint, and disturbance rejection.
+Both controllers were implemented on the Heli2DoF platform with $T_s = 20\,\text{ms}$. Aggregate metrics are summarized in Table~\ref{tab:comp}; Figs.~\ref{fig:pp_pitch}--\ref{fig:lqr_pert} show the time responses for pitch tracking, yaw constraint, and disturbance rejection.
 
 \begin{table}[H]
     \centering
@@ -168,53 +168,55 @@ Both controllers were implemented on the Heli2DoF platform with $T_s = 20\,\text
     \end{tabular}
 \end{table}
 
+\subsection{Pole Placement Results}
+
 The Pole Placement controller achieved satisfactory tracking performance in the pitch axis, meeting all transient specifications with a settling time of $5.12\,\text{s}$ and an overshoot of $3.12\%$. As observed in Figs.~\ref{fig:pp_pitch} and \ref{fig:pp_yaw}, the controller maintained acceptable yaw coupling, although the maximum yaw excursion reached $0.101\,\text{rad}$, which is essentially at the imposed constraint boundary. The disturbance rejection experiment shown in Fig.~\ref{fig:pp_pert} demonstrates a rapid recovery after the perturbation event, resulting in the highest PERT score among the evaluated controllers ($93.9$). These results indicate that the pole placement design provides a robust and well-balanced performance, particularly in disturbance attenuation.
 
-\begin{figure}[!t]
+\begin{figure}[H]
     \centering
-    \includegraphics[width=\linewidth]{PP_Pitch.png}
+    \includegraphics[width=0.85\linewidth]{PP_Pitch.png}
     \caption{Experimental pitch response using Pole Placement control. The transient specifications are satisfied with a settling time of $t_s = 5.12\,\text{s}$.}
     \label{fig:pp_pitch}
 \end{figure}
 
-\begin{figure}[!t]
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.85\linewidth]{PP_Yaw.png}
+    \caption{Yaw axis response under the pitch step reference using Pole Placement control. The maximum yaw deviation reaches $|\beta|_{\max}=0.101\,\text{rad}$, which is close to the specified limit.}
+    \label{fig:pp_yaw}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.85\linewidth]{PP_Pert_Yaw.png}
+    \caption{Yaw disturbance rejection experiment using Pole Placement control. The disturbance event occurs at approximately $t=12\,\text{s}$ and achieves a total PERT score of $94/100$.}
+    \label{fig:pp_pert}
+\end{figure}
+
+\subsection{LQR Results}
+
+The LQR controller exhibited the fastest pitch response, reducing the settling time to $2.92\,\text{s}$ while maintaining a low overshoot of $2.40\%$, as shown in Fig.~\ref{fig:lqr_pitch}. Furthermore, the yaw response in Fig.~\ref{fig:lqr_yaw} remained significantly below the specified limit, with a maximum deviation of only $0.026\,\text{rad}$, demonstrating superior decoupling between the pitch and yaw dynamics. Although the disturbance rejection performance in Fig.~\ref{fig:lqr_pert} yielded a slightly lower PERT score ($92.0$) than the Pole Placement controller, the recovery remained smooth and stable. Overall, the LQR design provided the best tracking speed and the largest yaw safety margin, highlighting the benefits of the optimal control formulation.
+
+\begin{figure}[H]
     \centering
     \includegraphics[width=\linewidth]{LQR_Pitch.png}
     \caption{Experimental pitch response using LQR control. The transient specifications are satisfied with a settling time of $t_s = 2.92\,\text{s}$, providing faster convergence than Pole Placement.}
     \label{fig:lqr_pitch}
 \end{figure}
- 
-\begin{figure}[!t]
+
+\begin{figure}[H]
     \centering
-    \includegraphics[width=\linewidth]{PP_Yaw.png}
-    \caption{Yaw axis response under the pitch step reference using Pole Placement control. The maximum yaw deviation reaches $|\beta|_{\max}=0.101\,\text{rad}$, which is close to the specified limit.}
-    \label{fig:pp_yaw}
-\end{figure}
-
-The LQR controller exhibited the fastest pitch response, reducing the settling time to $2.92\,\text{s}$ while maintaining a low overshoot of $2.40\%$, as shown in Fig.~\ref{fig:lqr_pitch}. Furthermore, the yaw response in Fig.~\ref{fig:lqr_yaw} remained significantly below the specified limit, with a maximum deviation of only $0.026\,\text{rad}$, demonstrating superior decoupling between the pitch and yaw dynamics. Although the disturbance rejection performance in Fig.~\ref{fig:lqr_pert} yielded a slightly lower PERT score ($92.0$) than the Pole Placement controller, the recovery remained smooth and stable. Overall, the LQR design provided the best tracking speed and the largest yaw safety margin, highlighting the benefits of the optimal control formulation.
-
-
-\begin{figure}[!t]
-    \centering
-    \includegraphics[width=\linewidth]{LQR_Yaw.png}
+    \includegraphics[width=0.85\linewidth]{LQR_Yaw.png}
     \caption{Yaw axis response under the pitch step reference using LQR control. The maximum yaw deviation is limited to $|\beta|_{\max}=0.026\,\text{rad}$, providing approximately a $3.8\times$ larger margin with respect to the specification.}
     \label{fig:lqr_yaw}
 \end{figure}
 
-\begin{figure}[!t]
+\begin{figure}[H]
     \centering
-    \includegraphics[width=\linewidth]{PP_Pert_Yaw.png}
-    \caption{Yaw disturbance rejection experiment using Pole Placement control. The disturbance event occurs at approximately $t=12\,\text{s}$ and achieves a total PERT score of $94/100$.}
-    \label{fig:pp_pert}
-\end{figure}
-
-\begin{figure}[!t]
-    \centering
-    \includegraphics[width=\linewidth]{LQR_Pert_Yaw.png}
+    \includegraphics[width=0.85\linewidth]{LQR_Pert_Yaw.png}
     \caption{Yaw disturbance rejection experiment using LQR control. The disturbance event occurs at approximately $t=12\,\text{s}$ and achieves a total PERT score of $83/100$.}
     \label{fig:lqr_pert}
 \end{figure}
-
 
 % ============================================================
 \section{Discussion}
